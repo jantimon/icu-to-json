@@ -5,6 +5,9 @@
   "main": "dist/runtime.js",
   "types": "dist/runtime.d.ts",
   "type": "module",
+  "bin": {
+    "icu-to-json": "./dist/cli.js"
+  },
   "exports": {
     ".": {
       "import": "./dist/runtime.js",
@@ -18,9 +21,10 @@
   "scripts": {
     "test": "vitest run",
     "test:types": "npx --package=@arethetypeswrong/cli attw --pack .",
-    "build": "npm run build:runtime && npm run build:compiler",
+    "build": "npm run build:runtime && npm run build:compiler && npm run build:cli",
     "build:runtime": "tsup src/runtime.ts --format cjs,esm --dts --minify --clean --sourcemap --out-dir dist",
     "build:compiler": "tsup src/compiler.ts --format cjs,esm --dts --minify --sourcemap --out-dir dist",
+    "build:cli": "tsup src/cli.ts --format esm --out-dir dist",
     "prepublishOnly": "npm run test && npm run build && npm run test:types"
   },
   "keywords": [],
