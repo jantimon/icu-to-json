@@ -6,7 +6,9 @@ Compile ICU MessageFormat strings to JSON at build time and render them at runti
 
 ## Goal
 
-This library aims to provide a way to compile ICU MessageFormat strings to compressed JSON at build time and render them at runtime with a minimal runtime footprint.
+The main goal is to boot up javascript apps with ICU translations as fast as possible for the end user.
+
+Therefore this library provides a way to compile ICU MessageFormat strings to compressed JSON at build time and render them at runtime with a minimal runtime footprint.
 
 ## Features
 
@@ -27,13 +29,7 @@ npm install icu-to-json
 
 ## Usage
 
-### Compile
-
-```sh
-icu-to-json src/messages.json dist/messages.json
-```
-
-### Render
+### Runtime
 
 Pure Interpolations
 
@@ -66,7 +62,25 @@ import { run } from 'icu-to-json';
 
 // e.g. precompiled icu messsage:
 // "You have <b>{count}</b> messages."
-run(precompiledMessage, ['en'], { count: 1, b: (content: number) => `**${number}**`})) // You have **1** messages.
+run(precompiledMessage, ['en'], { count: 2, b: (content: number) => `**${number}**`})) // You have **2** messages.
+```
+
+### Compile
+
+#### CLI
+
+The CLI can be used to compile ICU MessageFormat strings to JSON at build time.
+
+```sh
+icu-to-json src/messages.json dist/messages.json
+```
+
+#### API
+
+```js
+import { compile } from 'icu-to-json/compiler';
+
+const precompiledMessage = compile('Hello {name}!');
 ```
 
 ## Status
