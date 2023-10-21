@@ -1,0 +1,39 @@
+{
+  "name": "icu-to-json",
+  "version": "0.0.1",
+  "description": "Compile ICU MessageFormat strings to JSON at build time and render them at runtime",
+  "main": "dist/runtime.js",
+  "types": "dist/runtime.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/runtime.js",
+      "require": "./dist/runtime.cjs"
+    },
+    "./compiler": {
+      "import": "./dist/compiler.js",
+      "require": "./dist/compiler.cjs"
+    }
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:types": "npx --package=@arethetypeswrong/cli attw --pack .",
+    "build": "npm run build:runtime && npm run build:compiler",
+    "build:runtime": "tsup src/runtime.ts --format cjs,esm --dts --minify --clean --sourcemap --out-dir dist",
+    "build:compiler": "tsup src/compiler.ts --format cjs,esm --dts --minify --sourcemap --out-dir dist",
+    "prepublishOnly": "npm run test && npm run build && npm run test:types"
+  },
+  "keywords": [],
+  "author": "Jan Nicklas",
+  "license": "MIT",
+  "dependencies": {
+    "@messageformat/runtime": "3.0.1",
+    "make-plural": "7.3.0",
+    "@formatjs/icu-messageformat-parser": "2.7.0"
+  },
+  "devDependencies": {
+    "tsup": "7.2.0",
+    "vitest": "0.34.6",
+    "typescript": "5.2.2"
+  }
+}

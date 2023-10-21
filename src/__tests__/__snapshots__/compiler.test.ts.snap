@@ -1,0 +1,197 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`measure size for fn example 1`] = `
+[
+  "It is now {currentTime, time} on {currentTime, date}",
+  [
+    [
+      "currentTime",
+    ],
+    "It is now ",
+    [
+      4,
+      0,
+      "time",
+      null,
+    ],
+    " on ",
+    [
+      4,
+      0,
+      "date",
+      null,
+    ],
+  ],
+  "
+   size (icu message): 54b
+   size (json):        73b
+   overhead:           135%
+",
+]
+`;
+
+exports[`measure size for plural example 1`] = `
+[
+  "{count, plural, one {# Bild} other {# Bilder} }",
+  [
+    [
+      "count",
+    ],
+    [
+      2,
+      0,
+      {
+        "one": [
+          -1,
+          " Bild",
+        ],
+        "other": [
+          -1,
+          " Bilder",
+        ],
+      },
+    ],
+  ],
+  "
+   size (icu message): 49b
+   size (json):        61b
+   overhead:           124%
+",
+]
+`;
+
+exports[`measure size for select example 1`] = `
+[
+  "Hello, Your friend {friend} is now online. {gender, select, female {She} male {He} other {They}} added a new image to the system.",
+  [
+    [
+      "friend",
+      "gender",
+    ],
+    "Hello, Your friend ",
+    0,
+    " is now online. ",
+    [
+      1,
+      1,
+      {
+        "female": [
+          "She",
+        ],
+        "male": [
+          "He",
+        ],
+        "other": [
+          "They",
+        ],
+      },
+    ],
+    " added a new image to the system.",
+  ],
+  "
+   size (icu message): 131b
+   size (json):        156b
+   overhead:           119%
+",
+]
+`;
+
+exports[`measure size for selectordinal example 1`] = `
+[
+  "You finished {place, selectordinal,
+            one   {#st}
+            two   {#nd}
+            few   {#rd}
+            other {#th}
+        }!",
+  [
+    [
+      "place",
+    ],
+    "You finished ",
+    [
+      3,
+      0,
+      {
+        "few": [
+          -1,
+          "rd",
+        ],
+        "one": [
+          -1,
+          "st",
+        ],
+        "other": [
+          -1,
+          "th",
+        ],
+        "two": [
+          -1,
+          "nd",
+        ],
+      },
+    ],
+    "!",
+  ],
+  "
+   size (icu message): 149b
+   size (json):        105b
+   overhead:           70%
+",
+]
+`;
+
+exports[`measure size for tags example 1`] = `
+[
+  "Wow formatJs allows <b>{dynamic} tags</b>!",
+  [
+    [
+      "b",
+      "dynamic",
+    ],
+    "Wow formatJs allows ",
+    [
+      5,
+      0,
+      1,
+      " tags",
+    ],
+    "!",
+  ],
+  "
+   size (icu message): 44b
+   size (json):        60b
+   overhead:           136%
+",
+]
+`;
+
+exports[`measure size for text example 1`] = `
+[
+  "Hello",
+  "Hello",
+  "
+   size (icu message): 7b
+   size (json):        7b
+   overhead:           100%
+",
+]
+`;
+
+exports[`measure size for variable example 1`] = `
+[
+  "{name} has just entered the chat",
+  [
+    [
+      "name",
+    ],
+    0,
+    " has just entered the chat",
+  ],
+  "
+   size (icu message): 34b
+   size (json):        41b
+   overhead:           121%
+",
+]
+`;
