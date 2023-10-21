@@ -87,6 +87,11 @@ const precompiledMessage = compile('Hello {name}!');
 
 This library is still in early development and not yet ready for production use.
 
+## How does it work?
+
+The main work is done by the `@formatjs/icu-messageformat-parser`, which parses the ICU MessageFormat strings and returns an AST.
+The AST is then traversed and compiled to JSON by `icu-to-json`.
+
 ## License
 
 MIT
