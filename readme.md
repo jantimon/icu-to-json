@@ -31,7 +31,7 @@ npm install icu-to-json
 
 ### Runtime
 
-Pure Interpolations
+#### Pure Interpolations
 
 ```js
 import { run } from 'icu-to-json';
@@ -41,7 +41,7 @@ import { run } from 'icu-to-json';
 run(precompiledMessage, ['en'], { name: 'World' })) // Hello, World!
 ```
 
-Plurals and Selectordinal
+#### Plurals and Selectordinal
 
 ```js
 import { run } from 'icu-to-json';
@@ -55,7 +55,9 @@ run(precompiledMessage, ['en', en, enOd], { count: 1 })) // You have 1 unread me
 
 ```
 
-Tags
+#### Tags
+
+Tags can be used to wrap parts of the message. 
 
 ```js
 import { run } from 'icu-to-json';
@@ -63,6 +65,27 @@ import { run } from 'icu-to-json';
 // e.g. precompiled icu messsage:
 // "You have <b>{count}</b> messages."
 run(precompiledMessage, ['en'], { count: 2, b: (content: number) => `**${number}**`})) // You have **2** messages.
+```
+
+#### JSX
+
+The runtime is able to not only return strings but also richtext elements (e.g. JSX).  
+JSX is only used as an example here - it works with any other object as well.
+
+```jsx
+import { evaluateAst } from 'icu-to-json';
+
+import { en } from "@messageformat/runtime/lib/cardinals";
+import { en as enOd } from "make-plural/ordinals";
+
+const localeEn = ['en', en, enOd];
+// e.g. precompiled icu messsage:
+// "You have <link><b>{count, plural, one {# unread message} other {# unread messages}}.</b></link>"
+evaluateAst(precompiledMessage, localeEn, { 
+    count: 1, 
+    link: (content: string) => <a href="/messages">{content}</a>,
+    b: (content: string) => <b>{content}</b>
+})) // [ 'You have ', <a href="/messages"><b>1 unread message.</b></a> ]
 ```
 
 ### Compile
