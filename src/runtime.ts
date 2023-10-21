@@ -3,6 +3,18 @@ import { number, plural, select } from "./messageformat/runtime.js";
 import { type PluralCategory } from "@messageformat/runtime/lib/cardinals";
 import { CompiledAst, CompiledAstContents, JSON_AST_TYPE_FN, JSON_AST_TYPE_PLURAL, JSON_AST_TYPE_SELECT, JSON_AST_TYPE_SELECTORDINAL, JSON_AST_TYPE_TAG } from "./constants.js";
 
+/**
+ * Given a precompiled compiled ICU message JSON, return the evaluated string.
+ * If the message contains non-string values, they will be returned as an array of strings and values.
+ * 
+ * This allows using the runtime with React, Vue, Svelte, etc.
+ * 
+ * @param packedAst - The precompiled compiled ICU message JSON.
+ * @param locale - The current locale, cardinal, ordinal.
+ * @param args - The arguments to be used in the message.
+ * @param formatters - The formatters to be used in the message.
+ * @returns The evaluated string or an array of strings and values.
+ */
 export const evaluateAst = <T, U>(
   packedAst: CompiledAst,
   locale: Locale,
@@ -23,6 +35,12 @@ export const evaluateAst = <T, U>(
   return result;
 };
 
+/**
+ * Given a precompiled compiled ICU message JSON, return the evaluated string.
+ * 
+ * @param args - The arguments to be used in the message.
+ * @returns The evaluated string.
+ */
 export const run = <T, U>(
   ...args: Parameters<typeof evaluateAst<T, U>>
 ) => evaluateAst(...args).join("");
@@ -42,7 +60,12 @@ const reduceStrings = <T extends Array<any>>(arr: T): T => arr.reduce((acc, item
   return acc;
 }, [] as any as T);
 
-
+/**
+ * Recursively evaluate ICU expressions like `plural`, `select`, `selectordinal`, `fn` and `tag`
+ * and interpolate the values.
+ * 
+ * @returns The string - might also contain non-string values if non string/number arguments are used.
+ */
 const getContentValues = <T, U>(
   contents: CompiledAstContents,
   keys: { [keyIndex: number]: string },
