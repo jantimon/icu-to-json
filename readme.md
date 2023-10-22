@@ -1,5 +1,7 @@
 # icu-to-json
 
+<a href="https://pkg-size.dev/icu-to-json"><img src="https://pkg-size.dev/badge/bundle/1039" title="Bundle size for icu-to-json"></a>
+
 Compile ICU MessageFormat strings to JSON at build time and render them at runtime
 
 ![icu-to-json logo](https://raw.githubusercontent.com/jantimon/icu-to-json/main/docs/logo.jpg)
@@ -12,7 +14,7 @@ Therefore this library provides a way to compile ICU MessageFormat strings to co
 
 ## Features
 
-[![size of icu-to-json](https://raw.githubusercontent.com/jantimon/icu-to-json/main/docs/size.png)](https://pkg-size.dev/)
+[![size of icu-to-json](https://raw.githubusercontent.com/jantimon/icu-to-json/main/docs/size.png)](https://pkg-size.dev/icu-to-json)
 
 1. **Smaller Runtime Footprint**  
  The runtime footprint is only 1kb (minified and gzipped)
