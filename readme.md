@@ -12,9 +12,9 @@ The main goal is to boot up javascript apps with ICU translations as fast as pos
 
 Therefore this library provides a way to compile ICU MessageFormat strings to compressed JSON at build time and render them at runtime with a minimal runtime footprint.
 
-## Features
-
 [![size of icu-to-json](https://raw.githubusercontent.com/jantimon/icu-to-json/main/docs/size.png)](https://pkg-size.dev/icu-to-json)
+
+## Features
 
 1. **Smaller Runtime Footprint**  
  The runtime footprint is only 1kb (minified and gzipped)
@@ -22,8 +22,9 @@ Therefore this library provides a way to compile ICU MessageFormat strings to co
  The precompiled JSON can be rendered without any string parsing at runtime
 3. **Flexible**  
  The runtime is able to not only return strings but also richtext elements (e.g. JSX)
-4. **Types**
- The compiler generates types for ICU messages
+4. **Types**  
+ The compiler has an optional feature to typescript types for the ICU messages and their arguments
+
 
 [![animation showing type autocomplete](https://raw.githubusercontent.com/jantimon/icu-to-json/main/docs/types.gif)](https://github.com/jantimon/icu-to-json/blob/main/src/__tests__/__snapshots__/cli.test.messages.ts)  
 ⚠️ the typed `t()` function is not part of this library. It is only an example how the generated types could be used.
