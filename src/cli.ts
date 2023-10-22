@@ -256,7 +256,14 @@ function generateTypes(source: unknown): string {
   }
 
   const locales = languages.map((language) => {
-    return `export const ${language} = ["${language}", ${language}Plural, ${language}Ordinal] as any as Locale;`;
+    const lang = JSON.stringify(language);
+    const plural = usages.has("plural") ? language + "Plural" : (usages.has("selectordinal") ? "null" : undefined);
+    const ordinal = usages.has("selectordinal")
+      ? language + "Ordinal"
+      : undefined;
+    const localeParts = [lang, plural, ordinal].filter(Boolean);
+
+    return `export const ${language}: Locale = [${localeParts.join(", ")}]${localeParts.length !== 3 ? " as any" : ""};`;
   });
 
   return `${imports.join("\n")}\n${formatters}\n${types}\n${locales.join("\n")}`;
