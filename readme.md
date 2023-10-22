@@ -45,23 +45,22 @@ npm install icu-to-json
 
 ```js
 import { run } from 'icu-to-json';
+import { en } from "./precomiled";
 
 // e.g. precompiled icu messsage:
 // "Hello {name}!"
-run(precompiledMessage, ['en'], { name: 'World' })) // Hello, World!
+run(precompiledMessage, en, { name: 'World' })) // Hello, World!
 ```
 
 #### Plurals and Selectordinal
 
 ```js
 import { run } from 'icu-to-json';
-
-import { en } from "@messageformat/runtime/lib/cardinals";
-import { en as enOd } from "make-plural/ordinals";
+import { en } from "./precomiled";
 
 // e.g. precompiled icu messsage:
 // "You have {count, plural, one {# unread message} other {# unread messages}}."
-run(precompiledMessage, ['en', en, enOd], { count: 1 })) // You have 1 unread message.
+run(precompiledMessage, en, { count: 1 })) // You have 1 unread message.
 ```
 
 #### Tags
@@ -70,13 +69,14 @@ Tags can be used to wrap parts of the message.
 
 ```js
 import { run } from 'icu-to-json';
+import { en } from "./precomiled";
 
 // e.g. precompiled icu messsage:
 // "You have <b>{count}</b> messages."
-run(precompiledMessage, ['en'], { count: 2, b: (content: number) => `**${number}**`})) // You have **2** messages.
+run(precompiledMessage, en, { count: 2, b: (content: number) => `**${number}**`})) // You have **2** messages.
 ```
 
-#### JSX
+#### Rich Text
 
 The runtime is able to not only return strings but also richtext elements (e.g. JSX).  
 JSX is only used as an example here - it works with any other object as well.
@@ -104,7 +104,9 @@ evaluateAst(precompiledMessage, localeEn, {
 The CLI can be used to compile ICU MessageFormat strings to JSON at build time.
 
 ```sh
+# compile icu messages to json
 icu-to-json src/messages.json dist/messages.json
+# generate typescript types, locales and formatters from the icu messages
 icu-to-json --types src/messages.json dist/messages.json
 ```
 
