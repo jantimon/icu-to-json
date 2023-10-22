@@ -1,17 +1,10 @@
 import { en } from "@messageformat/runtime/lib/cardinals";
-import { date, numberFmt, time } from "@messageformat/runtime/lib/formatters";
 import { en as enOd } from "make-plural/ordinals";
 import { expect, test } from "vitest";
 import { compileToJson } from "../compiler.js";
 import { Locale, evaluateAst, run } from "../runtime.js";
 import messages from "./__snapshots__/cli.test.messages.json";
-import type { MessageArguments } from "./__snapshots__/cli.test.messages.js";
-
-const formatters = {
-  number: numberFmt,
-  date,
-  time,
-};
+import {type  MessageArguments, formatters } from "./__snapshots__/cli.test.messages.js";
 
 // example t implementation:
 const t = <TKey extends keyof MessageArguments>(

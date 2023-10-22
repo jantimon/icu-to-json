@@ -55,6 +55,7 @@ function generateTypes(source: unknown): string {
   if (typeof source !== "object" || source === null) {
     throw new Error("Invalid input");
   }
+  const usages = new Set<ArgumentUsage>();
   const typeMap = new Map<string, Record<string, string>>();
   const typeMapping: Record<ArgumentUsage, string> = {
     argument: "TArgumentType",
@@ -74,7 +75,8 @@ function generateTypes(source: unknown): string {
       }
       const compiled = compile(source);
       Object.entries(compiled.args).forEach(([arg, argType]) => {
-        keyArguments[arg] = typeMapping[argType];
+        keyArguments[arg] = typeMapping[argType.filter((usage) => usage !== "argument")[0] || "argument"];
+        argType.forEach((usage) => usages.add(usage));
       })
     } else if (Array.isArray(source)) {
       source.forEach((item, index) => recurse(item));
@@ -82,12 +84,31 @@ function generateTypes(source: unknown): string {
       Object.entries(source).forEach(([key, value]) => recurse(value, key));
     }
   };
+
   recurse(source);
-  return `export type MessageArguments<TArgumentType = number | string, TArgumentTagType = (children: TArgumentType) => TArgumentType> = {\n  ${[...typeMap.entries()]
+
+  const messageFormatFormatters: Record<string, string> = {};
+  if (usages.has("date")) {
+    messageFormatFormatters["date"] = "date";
+  }
+  if (usages.has("time")) {
+    messageFormatFormatters["time"] = "time";
+  }
+  if (usages.has("number")) {
+    messageFormatFormatters["number"] = "numberFmt as number";
+  }
+
+  const formatters = Object.keys(messageFormatFormatters).length ? 
+  `import { ${Object.values(messageFormatFormatters).join(", ")} } from "@messageformat/runtime/lib/formatters";
+export const formatters = { ${Object.keys(messageFormatFormatters).join(", ") } };` : "export const formatters = {};";
+
+  const types = `export type MessageArguments<TArgumentType = number | string, TArgumentTagType = (children: TArgumentType) => TArgumentType> = {\n  ${[...typeMap.entries()]
         .sort()
         .map(([key, args]) => {
             return `${JSON.stringify(key)}: {\n    ${[...Object.keys(args)].sort().map((argument) => {
                 return `${JSON.stringify(argument)}: ${args[argument]};`;
             }).join("\n    ")}\n  }`;
         }).join(",\n  ")}\n};`;
+
+  return `${formatters}\n${types}`;
 }

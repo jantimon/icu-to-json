@@ -1,3 +1,5 @@
+import { date, time, numberFmt as number } from "@messageformat/runtime/lib/formatters";
+export const formatters = { date, time, number };
 export type MessageArguments<TArgumentType = number | string, TArgumentTagType = (children: TArgumentType) => TArgumentType> = {
   "fn": {
     "currentTime": Date | number | string;

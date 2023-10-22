@@ -105,39 +105,39 @@ export type ArgumentUsage =
   | "plural";
 
 const getAllArguments = (ast: Ast) => {
-  const args: Record<string, ArgumentUsage> = {};
+  const args: Record<string, ArgumentUsage[]> = {};
   const getArgs = (node: MessageFormatElement) => {
     switch (node.type) {
       case TYPE.literal:
       case TYPE.pound:
         break;
       case TYPE.number:
-        args[node.value] = "number";
+        args[node.value] = addIfNotExists(args[node.value], "number");
         break;
       case TYPE.date:
-        args[node.value] = "date";
+        args[node.value] = addIfNotExists(args[node.value], "date");
         break;
       case TYPE.time:
-        args[node.value] = "time";
+        args[node.value] = addIfNotExists(args[node.value], "time");
         break;
       case TYPE.tag:
-        args[node.value] = "tag";
+        args[node.value] = addIfNotExists(args[node.value], "tag");
         node.children.forEach(getArgs);
         break;
       case TYPE.plural:
-        args[node.value] = "plural";
+        args[node.value] = addIfNotExists(args[node.value], "plural");
         Object.entries(node.options).forEach(([, pluralCase]) => {
           pluralCase.value.forEach(getArgs);
         });
         break;
       case TYPE.select:
-        args[node.value] ||= "select";
+        args[node.value] = addIfNotExists(args[node.value], "select");
         Object.entries(node.options).forEach(([, pluralCase]) => {
           pluralCase.value.forEach(getArgs);
         });
         break;
       case TYPE.argument:
-        args[node.value] ||= "argument";
+        args[node.value] = addIfNotExists(args[node.value], "argument");
         break;
       default:
         assertNever(node);
@@ -146,6 +146,16 @@ const getAllArguments = (ast: Ast) => {
   ast.forEach(getArgs);
   return args;
 };
+
+function addIfNotExists<T>(array: T[] | undefined, item: T) {
+  if (array === undefined) {
+    return [item];
+  }
+  if (!array.includes(item)) {
+    array.push(item);
+  }
+  return array;
+}
 
 function assertNever(x: never) {
   throw new Error("Unexpected object: " + x);
