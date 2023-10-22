@@ -28,9 +28,32 @@ exports[`measure size for fn example 1`] = `
 ]
 `;
 
+exports[`measure size for number example 1`] = `
+[
+  "I have {numCats, number} cats.",
+  [
+    [
+      "numCats",
+    ],
+    "I have ",
+    [
+      4,
+      0,
+      "number",
+    ],
+    " cats.",
+  ],
+  "
+   size (icu message): 32b
+   size (json):        47b
+   overhead:           +47%
+",
+]
+`;
+
 exports[`measure size for plural example 1`] = `
 [
-  "{count, plural, one {# Bild} other {# Bilder} }",
+  "{count, plural, one {# image} other {# images} }",
   [
     [
       "count",
@@ -41,18 +64,18 @@ exports[`measure size for plural example 1`] = `
       {
         "one": [
           -1,
-          " Bild",
+          " image",
         ],
         "other": [
           -1,
-          " Bilder",
+          " images",
         ],
       },
     ],
   ],
   "
-   size (icu message): 49b
-   size (json):        61b
+   size (icu message): 50b
+   size (json):        62b
    overhead:           +24%
 ",
 ]
@@ -96,12 +119,7 @@ exports[`measure size for select example 1`] = `
 
 exports[`measure size for selectordinal example 1`] = `
 [
-  "You finished {place, selectordinal,
-            one   {#st}
-            two   {#nd}
-            few   {#rd}
-            other {#th}
-        }!",
+  "You finished {place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}!",
   [
     [
       "place",
@@ -132,16 +150,16 @@ exports[`measure size for selectordinal example 1`] = `
     "!",
   ],
   "
-   size (icu message): 149b
+   size (icu message): 81b
    size (json):        105b
-   overhead:           -30%
+   overhead:           +30%
 ",
 ]
 `;
 
 exports[`measure size for tags example 1`] = `
 [
-  "Wow formatJs allows <b>{dynamic} tags</b>!",
+  "Wow formatJs allows <b>{dynamic} tags</b>",
   [
     [
       "b",
@@ -154,12 +172,11 @@ exports[`measure size for tags example 1`] = `
       1,
       " tags",
     ],
-    "!",
   ],
   "
-   size (icu message): 44b
-   size (json):        60b
-   overhead:           +36%
+   size (icu message): 43b
+   size (json):        56b
+   overhead:           +30%
 ",
 ]
 `;

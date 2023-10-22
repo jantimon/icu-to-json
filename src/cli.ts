@@ -62,6 +62,7 @@ function generateTypes(source: unknown): string {
     time: "Date | number | string",
     date: "Date | number | string",
     plural: "number",
+    number: "number",
     select: "number | string"
   }; 
   const recurse = (source: unknown, path?: string) => {

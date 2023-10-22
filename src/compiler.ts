@@ -72,14 +72,21 @@ const compileAst = (ast: Ast, args: string[]): CompiledAstContents[] => {
           JSON_AST_TYPE_FN,
           args.indexOf(node.value),
           "time",
-          ...(node.style !== null ? [node.style]: []),
+          ...(node.style !== null ? [node.style] : []),
         ] satisfies CompiledFn;
       case TYPE.date:
         return [
           JSON_AST_TYPE_FN,
           args.indexOf(node.value),
           "date",
-          ...(node.style !== null ? [node.style]: []),
+          ...(node.style !== null ? [node.style] : []),
+        ] satisfies CompiledFn;
+      case TYPE.number:
+        return [
+          JSON_AST_TYPE_FN,
+          args.indexOf(node.value),
+          "number",
+          ...(node.style !== null ? [node.style] : []),
         ] satisfies CompiledFn;
       default:
         console.log(node);
@@ -88,7 +95,14 @@ const compileAst = (ast: Ast, args: string[]): CompiledAstContents[] => {
   });
 };
 
-export type ArgumentUsage = "argument" | "tag" | "select" | "date" | "time" | "plural";
+export type ArgumentUsage =
+  | "argument"
+  | "tag"
+  | "select"
+  | "number"
+  | "date"
+  | "time"
+  | "plural";
 
 const getAllArguments = (ast: Ast) => {
   const args: Record<string, ArgumentUsage> = {};
@@ -98,7 +112,7 @@ const getAllArguments = (ast: Ast) => {
       case TYPE.pound:
         break;
       case TYPE.number:
-        args[node.value] ||= "argument";
+        args[node.value] = "number";
         break;
       case TYPE.date:
         args[node.value] = "date";

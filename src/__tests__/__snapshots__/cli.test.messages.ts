@@ -2,6 +2,9 @@ export type MessageArguments<TArgumentType = number | string, TArgumentTagType =
   "fn": {
     "currentTime": Date | number | string;
   },
+  "number": {
+    "numCats": number;
+  },
   "plural": {
     "count": number;
   },

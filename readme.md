@@ -2,7 +2,7 @@
 
 <a href="https://pkg-size.dev/icu-to-json"><img src="https://pkg-size.dev/badge/bundle/1039" title="Bundle size for icu-to-json"></a>
 
-Precompile i18n ICU MessageFormat translations to JSON at build time and render them at runtime
+Precompile i18n [icu syntax](https://formatjs.io/docs/core-concepts/icu-syntax) translations to JSON at build time and render them at runtime
 
 For example: `Hello {name}` → `["Hello ", 0]` → `Hello, World`
 

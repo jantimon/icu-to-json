@@ -1,5 +1,3 @@
-
-
 {
     "en": {
         "text": "Hello",
@@ -8,7 +6,8 @@
         "select": "Hello, Your friend {friend} is now online. {gender, select, female {She} male {He} other {They}} added a new image to the system.",
         "selectordinal": "You finished {place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}!",
         "fn": "It is now {currentTime, time} on {currentTime, date}",
-        "tags": "Wow formatJs allows <b>{dynamic} tags</b>"
+        "tags": "Wow formatJs allows <b>{dynamic} tags</b>",
+        "number": "I have {numCats, number} cats."
     },
     "es": {
         "text": "Hola",
@@ -17,7 +16,8 @@
         "select": "Hola, Tu amigo {friend} ahora está en línea. {gender, select, female {She} male {He} other {They}} agregó una nueva imagen al sistema.",
         "selectordinal": "¡Terminaste en el {place, selectordinal, one {#er} two {#do} few {#ro} other {#to}} lugar!",
         "fn": "Son las {currentTime, time} del {currentTime, date}",
-        "tags": "Wow formatJs permite <b>{dynamic} etiquetas</b>"
+        "tags": "Wow formatJs permite <b>{dynamic} etiquetas</b>",
+        "number": "Tengo {numCats, number} gatos."
     },
     "fr": {
         "text": "Bonjour",
@@ -26,7 +26,8 @@
         "select": "Bonjour, Votre ami {friend} est maintenant en ligne. {gender, select, female {She} male {He} other {They}} a ajouté une nouvelle image au système.",
         "selectordinal": "Vous avez terminé {place, selectordinal, one {#er} two {#ème} few {#ème} other {#ème}}!",
         "fn": "Il est maintenant {currentTime, time} le {currentTime, date}",
-        "tags": "Wow formatJs permet les <b>{dynamic} balises</b>"
+        "tags": "Wow formatJs permet les <b>{dynamic} balises</b>",
+        "number": "J'ai {numCats, number} chats."
     },
     "it": {
         "text": "Ciao",
@@ -35,7 +36,8 @@
         "select": "Ciao, Il tuo amico {friend} è ora online. {gender, select, female {She} male {He} other {Loro}} ha aggiunto una nuova immagine al sistema.",
         "selectordinal": "Hai finito al {place, selectordinal, one {#°} other {#°}} posto!",
         "fn": "Sono le {currentTime, time} del {currentTime, date}",
-        "tags": "Wow formatJs permette <b>{dynamic} tag</b>"
+        "tags": "Wow formatJs permette <b>{dynamic} tag</b>",
+        "number": "Ho {numCats, number} gatti."
     },
     "de": {
         "text": "Hallo",
@@ -44,6 +46,7 @@
         "select": "Hallo, Dein Freund {friend} ist jetzt online. {gender, select, female {She} male {He} other {They}} hat ein neues Bild zum System hinzugefügt.",
         "selectordinal": "Du hast den {place, selectordinal, other {#ten}} Platz erreicht!",
         "fn": "Es ist jetzt {currentTime, time} am {currentTime, date}",
-        "tags": "Wow, formatJs erlaubt <b>{dynamic} Tags</b>"
+        "tags": "Wow, formatJs erlaubt <b>{dynamic} Tags</b>",
+        "number": "Ich habe {numCats, number} Katzen."
     }
 }
