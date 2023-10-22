@@ -48,7 +48,7 @@ export const run = <T, U>(
 type LcFunc = (n: number | string) => PluralCategory;
 type ValueOf<T> = T[keyof T];
 /** [The current locale, cardinal, ordinal] e.g: `["en-US", require("@messageformat/runtime/lib/cardinals").en, require("make-plural/ordinals").en ]` */
-type Locale = readonly [string, LcFunc, LcFunc];
+export type Locale = readonly [string, LcFunc, LcFunc];
 
 const reduceStrings = <T extends Array<any>>(arr: T): T => arr.reduce((acc, item) => {
   if ([typeof item, typeof acc[acc.length - 1]].some((t) => t !== "string" && t !== "number")) {

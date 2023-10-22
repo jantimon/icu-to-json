@@ -1,52 +1,89 @@
-import { de, en } from "@messageformat/runtime/lib/cardinals";
-import { date, time, numberFmt } from "@messageformat/runtime/lib/formatters";
-import { en as enOd, de as deOd } from "make-plural/ordinals";
+import { en } from "@messageformat/runtime/lib/cardinals";
+import { date, numberFmt, time } from "@messageformat/runtime/lib/formatters";
+import { en as enOd } from "make-plural/ordinals";
+import { expect, test } from "vitest";
 import { compileToJson } from "../compiler.js";
-import { evaluateAst, run } from "../runtime.js";
-import { test, expect } from "vitest";
+import { Locale, evaluateAst, run } from "../runtime.js";
+import messages from "./__snapshots__/cli.test.messages.json";
+import type { MessageArguments } from "./__snapshots__/cli.test.messages.js";
 
-const deDE = ["de-DE", de, deOd] as const;
-const enUS = ["en-US", en, enOd] as const;
+const formatters = {
+  number: numberFmt,
+  date,
+  time,
+};
+
+// example t implementation:
+const t = <TKey extends keyof MessageArguments>(
+  key: TKey,
+  locale: Locale,
+  args: MessageArguments[TKey]
+) => {
+  return run(
+    (messages as any)[locale[0]][key],
+    locale,
+    args as any,
+    formatters
+  );
+};
+
+const enUS = ["en", en, enOd] as const;
+
+test("text", () => {
+  expect(t("text", enUS, {})).toMatchInlineSnapshot('"Hello"');
+});
+
+test("variable", () => {
+  expect(t("variable", enUS, { name: "Elvis" })).toMatchInlineSnapshot(
+    '"Elvis has just entered the chat"'
+  );
+});
 
 test("plural", () => {
-  const json = compileToJson(`{count, plural, one {# Bild} other {# Bilder} }`);
-  expect(run(json, deDE, { count: 0 })).toBe("0 Bilder");
-  expect(run(json, deDE, { count: 1 })).toBe("1 Bild");
-  expect(run(json, deDE, { count: 2 })).toBe("2 Bilder");
+  expect(t("plural", enUS, { count: 1 })).toMatchInlineSnapshot(
+    '"1 image"'
+  );
+});
+
+test("select", () => {
+  expect(
+    t("select", enUS, { friend: "Alex", gender: "female" })
+  ).toMatchInlineSnapshot(
+    '"Hello, Your friend Alex is now online. She added a new image to the system."'
+  );
 });
 
 test("selectordinal", () => {
-  const json = compileToJson(`You finished {place, selectordinal,
-        one   {#st}
-        two   {#nd}
-        few   {#rd}
-        other {#th}
-    }!`);
-  expect(run(json, enUS, { place: 1 })).toBe("You finished 1st!");
-  expect(run(json, enUS, { place: 2 })).toBe("You finished 2nd!");
-  expect(run(json, enUS, { place: 3 })).toBe("You finished 3rd!");
-  expect(run(json, enUS, { place: 4 })).toBe("You finished 4th!");
+  expect(t("selectordinal", enUS, { place: 3 })).toMatchInlineSnapshot(
+    '"You finished 3rd!"'
+  );
 });
 
 test("fn", () => {
-  const json = compileToJson(`It is now {T, time} on {T, date}`);
   expect(
-    run(
-      json,
-      enUS,
-      { T: new Date("2000-01-01 12:23:34") },
-      {
-        time,
-        date,
-      }
-    )
-  ).toEqual(`It is now 12:23:34 PM on Jan 1, 2000`);
+    t("fn", enUS, { currentTime: new Date("2020-02-02 02:02:02") })
+  ).toMatchInlineSnapshot(
+    '"It is now 2:02:02 AM on Feb 2, 2020"'
+  );
+});
+
+test("tags", () => {
+  expect(
+    t("tags", enUS, { b: (children) => `**${children}**`, dynamic: "⭐️" })
+  ).toMatchInlineSnapshot('"Wow formatJs allows **⭐️ tags**"');
 });
 
 test("number", () => {
-  const json = compileToJson(`I have {numCats, number} cats.`);
-  expect(run(json, enUS, { numCats: 4 }, { number: numberFmt })).toEqual(
-    `I have 4 cats.`
+  expect(t("number", enUS, { numCats: 99 })).toMatchInlineSnapshot(
+    '"I have 99 cats."'
+  );
+});
+
+test("time", () => {
+  expect(
+    t("time", enUS, { start: new Date("2020-02-02 02:02:02") })
+  ).toMatchInlineSnapshot(
+    '"Sale begins 2:02 AM at 2/2/2020"'
   );
 });
 
@@ -62,19 +99,4 @@ test("evaluateAst with non string argument", () => {
       {}
     )
   ).toEqual(["Hello ", ["World"], "!"]);
-});
-
-test("tags", () => {
-  const json = compileToJson(`Wow formatJs allows <b>{dynamic} tags</b>!`);
-  expect(
-    run(
-      json,
-      enUS,
-      {
-        dynamic: "flexible",
-        b: (children: string) => `<strong>${children}</strong>`,
-      },
-      {}
-    )
-  ).toEqual(`Wow formatJs allows <strong>flexible tags</strong>!`);
 });

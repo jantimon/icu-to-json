@@ -22,6 +22,9 @@ export type MessageArguments<TArgumentType = number | string, TArgumentTagType =
   "text": {
     
   },
+  "time": {
+    "start": Date | number | string;
+  },
   "variable": {
     "name": TArgumentType;
   }

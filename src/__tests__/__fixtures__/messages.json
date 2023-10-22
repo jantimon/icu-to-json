@@ -7,7 +7,8 @@
         "selectordinal": "You finished {place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}!",
         "fn": "It is now {currentTime, time} on {currentTime, date}",
         "tags": "Wow formatJs allows <b>{dynamic} tags</b>",
-        "number": "I have {numCats, number} cats."
+        "number": "I have {numCats, number} cats.",
+        "time": "Sale begins {start, time, short} at {start, date, short}"
     },
     "es": {
         "text": "Hola",
@@ -17,7 +18,8 @@
         "selectordinal": "¡Terminaste en el {place, selectordinal, one {#er} two {#do} few {#ro} other {#to}} lugar!",
         "fn": "Son las {currentTime, time} del {currentTime, date}",
         "tags": "Wow formatJs permite <b>{dynamic} etiquetas</b>",
-        "number": "Tengo {numCats, number} gatos."
+        "number": "Tengo {numCats, number} gatos.",
+        "time": "La venta comienza {start, time, short} el {start, date, short}"
     },
     "fr": {
         "text": "Bonjour",
@@ -27,7 +29,8 @@
         "selectordinal": "Vous avez terminé {place, selectordinal, one {#er} two {#ème} few {#ème} other {#ème}}!",
         "fn": "Il est maintenant {currentTime, time} le {currentTime, date}",
         "tags": "Wow formatJs permet les <b>{dynamic} balises</b>",
-        "number": "J'ai {numCats, number} chats."
+        "number": "J'ai {numCats, number} chats.",
+        "time": "La vente commence {start, time, short} le {start, date, short}"
     },
     "it": {
         "text": "Ciao",
@@ -37,7 +40,8 @@
         "selectordinal": "Hai finito al {place, selectordinal, one {#°} other {#°}} posto!",
         "fn": "Sono le {currentTime, time} del {currentTime, date}",
         "tags": "Wow formatJs permette <b>{dynamic} tag</b>",
-        "number": "Ho {numCats, number} gatti."
+        "number": "Ho {numCats, number} gatti.",
+        "time": "La vendita inizia {start, time, short} il {start, date, short}"
     },
     "de": {
         "text": "Hallo",
@@ -47,6 +51,7 @@
         "selectordinal": "Du hast den {place, selectordinal, other {#ten}} Platz erreicht!",
         "fn": "Es ist jetzt {currentTime, time} am {currentTime, date}",
         "tags": "Wow, formatJs erlaubt <b>{dynamic} Tags</b>",
-        "number": "Ich habe {numCats, number} Katzen."
+        "number": "Ich habe {numCats, number} Katzen.",
+        "time": "Der Verkauf beginnt {start, time, short} am {start, date, short}"
     }
 }

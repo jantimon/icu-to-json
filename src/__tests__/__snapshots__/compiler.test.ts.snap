@@ -193,6 +193,36 @@ exports[`measure size for text example 1`] = `
 ]
 `;
 
+exports[`measure size for time example 1`] = `
+[
+  "Sale begins {start, time, short} at {start, date, short}",
+  [
+    [
+      "start",
+    ],
+    "Sale begins ",
+    [
+      4,
+      0,
+      "time",
+      "short",
+    ],
+    " at ",
+    [
+      4,
+      0,
+      "date",
+      "short",
+    ],
+  ],
+  "
+   size (icu message): 58b
+   size (json):        75b
+   overhead:           +29%
+",
+]
+`;
+
 exports[`measure size for variable example 1`] = `
 [
   "{name} has just entered the chat",
