@@ -1,6 +1,6 @@
 import { writeFile, readFile, mkdir } from "fs/promises";
 import { dirname } from "path";
-import { compileToJson } from "./compiler.js";
+import { ArgumentKind, compile, compileToJson } from "./compiler.js";
 
 export async function cli(input: string, output: string, types: boolean) {
   if (!input || !output) {
@@ -55,20 +55,25 @@ function generateTypes(source: unknown): string {
   if (typeof source !== "object" || source === null) {
     throw new Error("Invalid input");
   }
-  const typeMap = new Map<string, Set<string>>();
+  const typeMap = new Map<string, Record<string, string>>();
+  const typeMapping: { [key in ArgumentKind ]: string} = {
+    normal: "TArgumentTypes",
+    tag: "TArgumentTagType",
+    time: "Date | number | string",
+    date: "Date | number | string",
+    number: "number"
+  }; 
   const recurse = (source: unknown, path?: string) => {
     if (typeof source === "string" && path !== undefined) {
       const keyArgumentsFromMap = typeMap.get(path);
-      const keyArguments = keyArgumentsFromMap || new Set();
+      const keyArguments = keyArgumentsFromMap || {};
       if (!keyArgumentsFromMap) {
         typeMap.set(path, keyArguments);
       }
-      const compiled = compileToJson(source);
-      if (typeof compiled !== "string") {
-        compiled[0].forEach((argument) => {
-            keyArguments.add(argument);
-        });
-      }
+      const compiled = compile(source);
+      Object.entries(compiled.args).forEach(([arg, argType]) => {
+        keyArguments[arg] = typeMapping[argType];
+      })
     } else if (Array.isArray(source)) {
       source.forEach((item, index) => recurse(item));
     } else if (typeof source === "object" && source !== null) {
@@ -76,11 +81,11 @@ function generateTypes(source: unknown): string {
     }
   };
   recurse(source);
-  return `export type MessageArguments<TArgumentTypes = number | string> = {\n  ${[...typeMap.entries()]
+  return `export type MessageArguments<TArgumentTypes = number | string, TArgumentTagType = (children: TArgumentTypes) => TArgumentTypes> = {\n  ${[...typeMap.entries()]
         .sort()
-        .map(([key, value]) => {
-            return `${JSON.stringify(key)}: {\n    ${[...value].sort().map((argument) => {
-                return `${JSON.stringify(argument)}: TArgumentTypes;`;
+        .map(([key, args]) => {
+            return `${JSON.stringify(key)}: {\n    ${[...Object.keys(args)].sort().map((argument) => {
+                return `${JSON.stringify(argument)}: ${args[argument]};`;
             }).join("\n    ")}\n  }`;
         }).join(",\n  ")}\n};`;
 }

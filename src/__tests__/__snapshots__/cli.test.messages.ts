@@ -1,19 +1,19 @@
-export type MessageArguments<TArgumentTypes = number | string> = {
+export type MessageArguments<TArgumentTypes = number | string, TArgumentTagType = (children: TArgumentTypes) => TArgumentTypes> = {
   "fn": {
-    "currentTime": TArgumentTypes;
+    "currentTime": Date | number | string;
   },
   "plural": {
-    "count": TArgumentTypes;
+    "count": number;
   },
   "select": {
     "friend": TArgumentTypes;
     "gender": TArgumentTypes;
   },
   "selectordinal": {
-    "place": TArgumentTypes;
+    "place": number;
   },
   "tags": {
-    "b": TArgumentTypes;
+    "b": TArgumentTagType;
     "dynamic": TArgumentTypes;
   },
   "text": {
