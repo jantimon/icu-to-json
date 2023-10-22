@@ -23,7 +23,7 @@ Therefore this library provides a way to compile ICU MessageFormat strings to co
 3. **Flexible**  
  The runtime is able to not only return strings but also richtext elements (e.g. JSX)
 4. **Types**  
- The compiler has an optional feature to typescript types for the ICU messages and their arguments
+ The compiler has an optional feature to generate typescript types for the ICU messages and their arguments
 
 
 [![animation showing type autocomplete](https://raw.githubusercontent.com/jantimon/icu-to-json/main/docs/types.gif)](https://github.com/jantimon/icu-to-json/blob/main/src/__tests__/__snapshots__/cli.test.messages.ts)  
