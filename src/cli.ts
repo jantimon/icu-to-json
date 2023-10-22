@@ -1,6 +1,6 @@
-import { writeFile, readFile, mkdir } from "fs/promises";
+import { mkdir, readFile, writeFile } from "fs/promises";
 import { dirname } from "path";
-import { ArgumentKind, compile, compileToJson } from "./compiler.js";
+import { ArgumentUsage, compile, compileToJson } from "./compiler.js";
 
 export async function cli(input: string, output: string, types: boolean) {
   if (!input || !output) {
@@ -56,12 +56,13 @@ function generateTypes(source: unknown): string {
     throw new Error("Invalid input");
   }
   const typeMap = new Map<string, Record<string, string>>();
-  const typeMapping: { [key in ArgumentKind ]: string} = {
-    normal: "TArgumentTypes",
+  const typeMapping: Record<ArgumentUsage, string> = {
+    argument: "TArgumentType",
     tag: "TArgumentTagType",
     time: "Date | number | string",
     date: "Date | number | string",
-    number: "number"
+    plural: "number",
+    select: "number | string"
   }; 
   const recurse = (source: unknown, path?: string) => {
     if (typeof source === "string" && path !== undefined) {
@@ -81,7 +82,7 @@ function generateTypes(source: unknown): string {
     }
   };
   recurse(source);
-  return `export type MessageArguments<TArgumentTypes = number | string, TArgumentTagType = (children: TArgumentTypes) => TArgumentTypes> = {\n  ${[...typeMap.entries()]
+  return `export type MessageArguments<TArgumentType = number | string, TArgumentTagType = (children: TArgumentType) => TArgumentType> = {\n  ${[...typeMap.entries()]
         .sort()
         .map(([key, args]) => {
             return `${JSON.stringify(key)}: {\n    ${[...Object.keys(args)].sort().map((argument) => {

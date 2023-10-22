@@ -12,20 +12,18 @@ exports[`measure size for fn example 1`] = `
       4,
       0,
       "time",
-      null,
     ],
     " on ",
     [
       4,
       0,
       "date",
-      null,
     ],
   ],
   "
    size (icu message): 54b
-   size (json):        73b
-   overhead:           135%
+   size (json):        63b
+   overhead:           +17%
 ",
 ]
 `;
@@ -55,7 +53,7 @@ exports[`measure size for plural example 1`] = `
   "
    size (icu message): 49b
    size (json):        61b
-   overhead:           124%
+   overhead:           +24%
 ",
 ]
 `;
@@ -91,7 +89,7 @@ exports[`measure size for select example 1`] = `
   "
    size (icu message): 131b
    size (json):        156b
-   overhead:           119%
+   overhead:           +19%
 ",
 ]
 `;
@@ -136,7 +134,7 @@ exports[`measure size for selectordinal example 1`] = `
   "
    size (icu message): 149b
    size (json):        105b
-   overhead:           70%
+   overhead:           -30%
 ",
 ]
 `;
@@ -161,7 +159,7 @@ exports[`measure size for tags example 1`] = `
   "
    size (icu message): 44b
    size (json):        60b
-   overhead:           136%
+   overhead:           +36%
 ",
 ]
 `;
@@ -173,7 +171,7 @@ exports[`measure size for text example 1`] = `
   "
    size (icu message): 7b
    size (json):        7b
-   overhead:           100%
+   overhead:           0%
 ",
 ]
 `;
@@ -191,7 +189,7 @@ exports[`measure size for variable example 1`] = `
   "
    size (icu message): 34b
    size (json):        41b
-   overhead:           121%
+   overhead:           +21%
 ",
 ]
 `;

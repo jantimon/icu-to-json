@@ -24,12 +24,12 @@ test.each([
     const json = compileToJson(icuMessage);
     const size = JSON.stringify(icuMessage).length;
     const jsonSize = JSON.stringify(json).length;
-    const percent = Math.round((jsonSize / size) * 100);
+    const percent = Math.round((jsonSize / size) * 100) - 100;
 
     expect(
         [icuMessage, json, `\n` +
         `   size (icu message): ${size}b\n` +
         `   size (json):        ${jsonSize}b\n` +
-        `   overhead:           ${percent}%\n`
+        `   overhead:           ${percent > 0 ? "+":""}${percent}%\n`
     ]).toMatchSnapshot()
   });

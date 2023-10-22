@@ -2,7 +2,9 @@
 
 <a href="https://pkg-size.dev/icu-to-json"><img src="https://pkg-size.dev/badge/bundle/1039" title="Bundle size for icu-to-json"></a>
 
-Compile ICU MessageFormat strings to JSON at build time and render them at runtime
+Precompile i18n ICU MessageFormat translations to JSON at build time and render them at runtime
+
+For example: `Hello {name}` → `["Hello ", 0]` → `Hello, World`
 
 ![icu-to-json logo](https://raw.githubusercontent.com/jantimon/icu-to-json/main/docs/logo.jpg)
 
@@ -60,7 +62,6 @@ import { en as enOd } from "make-plural/ordinals";
 // e.g. precompiled icu messsage:
 // "You have {count, plural, one {# unread message} other {# unread messages}}."
 run(precompiledMessage, ['en', en, enOd], { count: 1 })) // You have 1 unread message.
-
 ```
 
 #### Tags

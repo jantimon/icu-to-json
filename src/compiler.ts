@@ -72,14 +72,14 @@ const compileAst = (ast: Ast, args: string[]): CompiledAstContents[] => {
           JSON_AST_TYPE_FN,
           args.indexOf(node.value),
           "time",
-          node.style,
+          ...(node.style !== null ? [node.style]: []),
         ] satisfies CompiledFn;
       case TYPE.date:
         return [
           JSON_AST_TYPE_FN,
           args.indexOf(node.value),
           "date",
-          node.style,
+          ...(node.style !== null ? [node.style]: []),
         ] satisfies CompiledFn;
       default:
         console.log(node);
@@ -88,17 +88,17 @@ const compileAst = (ast: Ast, args: string[]): CompiledAstContents[] => {
   });
 };
 
-export type ArgumentKind = "normal" | "tag" | "date" | "time" | "number";
+export type ArgumentUsage = "argument" | "tag" | "select" | "date" | "time" | "plural";
 
 const getAllArguments = (ast: Ast) => {
-  const args: Record<string, ArgumentKind> = {};
+  const args: Record<string, ArgumentUsage> = {};
   const getArgs = (node: MessageFormatElement) => {
     switch (node.type) {
       case TYPE.literal:
       case TYPE.pound:
         break;
       case TYPE.number:
-        args[node.value] ||= "normal";
+        args[node.value] ||= "argument";
         break;
       case TYPE.date:
         args[node.value] = "date";
@@ -111,19 +111,19 @@ const getAllArguments = (ast: Ast) => {
         node.children.forEach(getArgs);
         break;
       case TYPE.plural:
-        args[node.value] = "number";
+        args[node.value] = "plural";
         Object.entries(node.options).forEach(([, pluralCase]) => {
           pluralCase.value.forEach(getArgs);
         });
         break;
       case TYPE.select:
-        args[node.value] ||= "normal";
+        args[node.value] ||= "select";
         Object.entries(node.options).forEach(([, pluralCase]) => {
           pluralCase.value.forEach(getArgs);
         });
         break;
       case TYPE.argument:
-        args[node.value] ||= "normal";
+        args[node.value] ||= "argument";
         break;
       default:
         assertNever(node);
