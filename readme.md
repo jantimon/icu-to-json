@@ -2,7 +2,7 @@
 
 Compile ICU MessageFormat strings to JSON at build time and render them at runtime
 
-![icu-to-json](https://raw.githubusercontent.com/jantimon/icu-to-json/main/logo.jpg)
+![icu-to-json logo](https://raw.githubusercontent.com/jantimon/icu-to-json/main/docs/logo.jpg)
 
 ## Goal
 
@@ -12,7 +12,7 @@ Therefore this library provides a way to compile ICU MessageFormat strings to co
 
 ## Features
 
-![icu-to-json](https://raw.githubusercontent.com/jantimon/icu-to-json/main/size.png)
+[![size of icu-to-json](https://raw.githubusercontent.com/jantimon/icu-to-json/main/docs/size.png)](https://pkg-size.dev/)
 
 1. **Smaller Runtime Footprint**  
  The runtime footprint is only 1kb (minified and gzipped)
@@ -20,6 +20,11 @@ Therefore this library provides a way to compile ICU MessageFormat strings to co
  The precompiled JSON can be rendered without any string parsing at runtime
 3. **Flexible**  
  The runtime is able to not only return strings but also richtext elements (e.g. JSX)
+4. **Types**
+ The compiler generates types for ICU messages
+
+[![animation showing type autocomplete](https://raw.githubusercontent.com/jantimon/icu-to-json/main/docs/types.gif)](https://github.com/jantimon/icu-to-json/blob/main/src/__tests__/__snapshots__/cli.test.messages.ts)  
+⚠️ the typed `t()` function is not part of this library. It is only an example how the generated types could be used.
 
 ## Installation
 
@@ -96,6 +101,7 @@ The CLI can be used to compile ICU MessageFormat strings to JSON at build time.
 
 ```sh
 icu-to-json src/messages.json dist/messages.json
+icu-to-json --types src/messages.json dist/messages.json
 ```
 
 #### API
