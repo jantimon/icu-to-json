@@ -99,6 +99,7 @@ export type ArgumentUsage =
   | "argument"
   | "tag"
   | "select"
+  | "selectordinal"
   | "number"
   | "date"
   | "time"
@@ -125,7 +126,7 @@ const getAllArguments = (ast: Ast) => {
         node.children.forEach(getArgs);
         break;
       case TYPE.plural:
-        args[node.value] = addIfNotExists(args[node.value], "plural");
+        args[node.value] = addIfNotExists(args[node.value], node.pluralType === "cardinal" ? "plural" : "selectordinal");
         Object.entries(node.options).forEach(([, pluralCase]) => {
           pluralCase.value.forEach(getArgs);
         });

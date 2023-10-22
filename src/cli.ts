@@ -19,7 +19,7 @@ export async function cli(input: string, output: string, types: boolean) {
   await mkdir(dirname(output), { recursive: true });
   await writeFile(output, result);
   console.log(`Wrote ${output}`);
-};
+}
 
 if (process.env.NODE_ENV !== "test") {
   const args = process.argv.slice(2).filter((arg) => !arg.startsWith("-"));
@@ -63,9 +63,10 @@ function generateTypes(source: unknown): string {
     time: "Date | number | string",
     date: "Date | number | string",
     plural: "number",
+    selectordinal: "number",
     number: "number",
-    select: "number | string"
-  }; 
+    select: "number | string",
+  };
   const recurse = (source: unknown, path?: string) => {
     if (typeof source === "string" && path !== undefined) {
       const keyArgumentsFromMap = typeMap.get(path);
@@ -75,9 +76,12 @@ function generateTypes(source: unknown): string {
       }
       const compiled = compile(source);
       Object.entries(compiled.args).forEach(([arg, argType]) => {
-        keyArguments[arg] = typeMapping[argType.filter((usage) => usage !== "argument")[0] || "argument"];
+        keyArguments[arg] =
+          typeMapping[
+            argType.filter((usage) => usage !== "argument")[0] || "argument"
+          ];
         argType.forEach((usage) => usages.add(usage));
-      })
+      });
     } else if (Array.isArray(source)) {
       source.forEach((item, index) => recurse(item));
     } else if (typeof source === "object" && source !== null) {
@@ -98,17 +102,162 @@ function generateTypes(source: unknown): string {
     messageFormatFormatters["number"] = "numberFmt as number";
   }
 
-  const formatters = Object.keys(messageFormatFormatters).length ? 
-  `import { ${Object.values(messageFormatFormatters).join(", ")} } from "@messageformat/runtime/lib/formatters";
-export const formatters = { ${Object.keys(messageFormatFormatters).join(", ") } };` : "export const formatters = {};";
+  const imports = [`import type { Locale } from "icu-to-json";`];
 
-  const types = `export type MessageArguments<TArgumentType = number | string, TArgumentTagType = (children: TArgumentType) => TArgumentType> = {\n  ${[...typeMap.entries()]
+  if (Object.keys(messageFormatFormatters).length) {
+    imports.push(
+      `import { ${Object.values(messageFormatFormatters).join(
+        ", "
+      )} } from "@messageformat/runtime/lib/formatters";`
+    );
+  }
+
+  const formatters = `export const formatters = { ${Object.keys(
+    messageFormatFormatters
+  ).join(", ")} };`;
+
+  const types = `export type MessageArguments<TArgumentType = number | string, TArgumentTagType = (children: TArgumentType) => TArgumentType> = {\n  ${[
+    ...typeMap.entries(),
+  ]
+    .sort()
+    .map(([key, args]) => {
+      return `${JSON.stringify(key)}: {\n    ${[...Object.keys(args)]
         .sort()
-        .map(([key, args]) => {
-            return `${JSON.stringify(key)}: {\n    ${[...Object.keys(args)].sort().map((argument) => {
-                return `${JSON.stringify(argument)}: ${args[argument]};`;
-            }).join("\n    ")}\n  }`;
-        }).join(",\n  ")}\n};`;
+        .map((argument) => {
+          return `${JSON.stringify(argument)}: ${args[argument]};`;
+        })
+        .join("\n    ")}\n  }`;
+    })
+    .join(",\n  ")}\n};`;
 
-  return `${formatters}\n${types}`;
+  const languages = [
+    "af",
+    "am",
+    "an",
+    "ar",
+    "as",
+    "ast",
+    "az",
+    "bal",
+    "be",
+    "bg",
+    "bn",
+    "bs",
+    "ca",
+    "ce",
+    "cs",
+    "cy",
+    "da",
+    "de",
+    "dsb",
+    "el",
+    "en",
+    "es",
+    "et",
+    "eu",
+    "fa",
+    "fi",
+    "fil",
+    "fr",
+    "fy",
+    "ga",
+    "gd",
+    "gl",
+    "gsw",
+    "gu",
+    "he",
+    "hi",
+    "hr",
+    "hsb",
+    "hu",
+    "hy",
+    "ia",
+    "id",
+    "is",
+    "it",
+    "ja",
+    "ka",
+    "kk",
+    "km",
+    "kn",
+    "ko",
+    "kw",
+    "ky",
+    "lij",
+    "lo",
+    "lt",
+    "lv",
+    "mk",
+    "ml",
+    "mn",
+    "mo",
+    "mr",
+    "ms",
+    "my",
+    "nb",
+    "ne",
+    "nl",
+    "no",
+    "or",
+    "pa",
+    "pl",
+    "prg",
+    "ps",
+    "pt",
+    "ro",
+    "ru",
+    "sc",
+    "scn",
+    "sd",
+    "sh",
+    "si",
+    "sk",
+    "sl",
+    "sq",
+    "sr",
+    "sv",
+    "sw",
+    "ta",
+    "te",
+    "th",
+    "tk",
+    "tl",
+    "tpi",
+    "tr",
+    "uk",
+    "und",
+    "ur",
+    "uz",
+    "vec",
+    "vi",
+    "yue",
+    "zh",
+    "zu",
+  ];
+
+  const pluralImports = languages.map(
+    (language) => language + " as " + language + "Plural"
+  );
+  const ordinalImports = languages.map(
+    (language) => language + " as " + language + "Ordinal"
+  );
+
+  if (usages.has("plural")) {
+    imports.push(
+      `import { ${pluralImports.join(", ")} } from "make-plural/plurals";`
+    );
+  }
+  if (usages.has("selectordinal")) {
+    imports.push(
+      `import { ${ordinalImports.join(
+        ", "
+      )} } from "@messageformat/runtime/lib/cardinals";`
+    );
+  }
+
+  const locales = languages.map((language) => {
+    return `export const ${language} = ["${language}", ${language}Plural, ${language}Ordinal] as any as Locale;`;
+  });
+
+  return `${imports.join("\n")}\n${formatters}\n${types}\n${locales.join("\n")}`;
 }

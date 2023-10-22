@@ -1,10 +1,8 @@
-import { en } from "@messageformat/runtime/lib/cardinals";
-import { en as enOd } from "make-plural/ordinals";
 import { expect, test } from "vitest";
 import { compileToJson } from "../compiler.js";
 import { Locale, evaluateAst, run } from "../runtime.js";
 import messages from "./__snapshots__/cli.test.messages.json";
-import {type  MessageArguments, formatters } from "./__snapshots__/cli.test.messages.js";
+import { type MessageArguments, formatters, en } from "./__snapshots__/cli.test.messages.js";
 
 // example t implementation:
 const t = <TKey extends keyof MessageArguments>(
@@ -20,41 +18,39 @@ const t = <TKey extends keyof MessageArguments>(
   );
 };
 
-const enUS = ["en", en, enOd] as const;
-
 test("text", () => {
-  expect(t("text", enUS, {})).toMatchInlineSnapshot('"Hello"');
+  expect(t("text", en, {})).toMatchInlineSnapshot('"Hello"');
 });
 
 test("variable", () => {
-  expect(t("variable", enUS, { name: "Elvis" })).toMatchInlineSnapshot(
+  expect(t("variable", en, { name: "Elvis" })).toMatchInlineSnapshot(
     '"Elvis has just entered the chat"'
   );
 });
 
 test("plural", () => {
-  expect(t("plural", enUS, { count: 1 })).toMatchInlineSnapshot(
+  expect(t("plural", en, { count: 1 })).toMatchInlineSnapshot(
     '"1 image"'
   );
 });
 
 test("select", () => {
   expect(
-    t("select", enUS, { friend: "Alex", gender: "female" })
+    t("select", en, { friend: "Alex", gender: "female" })
   ).toMatchInlineSnapshot(
     '"Hello, Your friend Alex is now online. She added a new image to the system."'
   );
 });
 
 test("selectordinal", () => {
-  expect(t("selectordinal", enUS, { place: 3 })).toMatchInlineSnapshot(
-    '"You finished 3rd!"'
+  expect(t("selectordinal", en, { place: 3 })).toMatchInlineSnapshot(
+    '"You finished 3th!"'
   );
 });
 
 test("fn", () => {
   expect(
-    t("fn", enUS, { currentTime: new Date("2020-02-02 02:02:02") })
+    t("fn", en, { currentTime: new Date("2020-02-02 02:02:02") })
   ).toMatchInlineSnapshot(
     '"It is now 2:02:02 AM on Feb 2, 2020"'
   );
@@ -62,19 +58,19 @@ test("fn", () => {
 
 test("tags", () => {
   expect(
-    t("tags", enUS, { b: (children) => `**${children}**`, dynamic: "⭐️" })
+    t("tags", en, { b: (children) => `**${children}**`, dynamic: "⭐️" })
   ).toMatchInlineSnapshot('"Wow formatJs allows **⭐️ tags**"');
 });
 
 test("number", () => {
-  expect(t("number", enUS, { numCats: 99 })).toMatchInlineSnapshot(
+  expect(t("number", en, { numCats: 99 })).toMatchInlineSnapshot(
     '"I have 99 cats."'
   );
 });
 
 test("time", () => {
   expect(
-    t("time", enUS, { start: new Date("2020-02-02 02:02:02") })
+    t("time", en, { start: new Date("2020-02-02 02:02:02") })
   ).toMatchInlineSnapshot(
     '"Sale begins 2:02 AM at 2/2/2020"'
   );
@@ -85,7 +81,7 @@ test("evaluateAst with non string argument", () => {
   expect(
     evaluateAst(
       json,
-      enUS,
+      en,
       {
         name: ["World"],
       },
