@@ -24,9 +24,7 @@ export type MessageArguments<TArgumentType = number | string, TArgumentTagType =
     "b": TArgumentTagType;
     "dynamic": TArgumentType;
   },
-  "text": {
-    
-  },
+  "text"?: never | Record<string, never>,
   "time": {
     "start": Date | number | string;
   },

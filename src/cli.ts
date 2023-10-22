@@ -121,9 +121,12 @@ function generateTypes(source: unknown): string {
   ]
     .sort()
     .map(([key, args]) => {
-      return `${JSON.stringify(key)}: {\n    ${[...Object.keys(args)]
-        .sort()
-        .map((argument) => {
+      const keyArguments = Object.keys(args).sort();
+      if (!keyArguments.length) {
+        return `${JSON.stringify(key)}?: never | Record<string, never>`;
+      }
+      return `${JSON.stringify(key)}: {\n    ${
+        keyArguments.map((argument) => {
           return `${JSON.stringify(argument)}: ${args[argument]};`;
         })
         .join("\n    ")}\n  }`;
