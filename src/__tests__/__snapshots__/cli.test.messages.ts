@@ -1,14 +1,23 @@
 import type { Locale } from "icu-to-json";
-import { date, time, numberFmt as number } from "@messageformat/runtime/lib/formatters";
+import { date, time, numberFmt } from "@messageformat/runtime/lib/formatters";
 import { af as afPlural, am as amPlural, an as anPlural, ar as arPlural, as as asPlural, ast as astPlural, az as azPlural, bal as balPlural, be as bePlural, bg as bgPlural, bn as bnPlural, bs as bsPlural, ca as caPlural, ce as cePlural, cs as csPlural, cy as cyPlural, da as daPlural, de as dePlural, dsb as dsbPlural, el as elPlural, en as enPlural, es as esPlural, et as etPlural, eu as euPlural, fa as faPlural, fi as fiPlural, fil as filPlural, fr as frPlural, fy as fyPlural, ga as gaPlural, gd as gdPlural, gl as glPlural, gsw as gswPlural, gu as guPlural, he as hePlural, hi as hiPlural, hr as hrPlural, hsb as hsbPlural, hu as huPlural, hy as hyPlural, ia as iaPlural, id as idPlural, is as isPlural, it as itPlural, ja as jaPlural, ka as kaPlural, kk as kkPlural, km as kmPlural, kn as knPlural, ko as koPlural, kw as kwPlural, ky as kyPlural, lij as lijPlural, lo as loPlural, lt as ltPlural, lv as lvPlural, mk as mkPlural, ml as mlPlural, mn as mnPlural, mo as moPlural, mr as mrPlural, ms as msPlural, my as myPlural, nb as nbPlural, ne as nePlural, nl as nlPlural, no as noPlural, or as orPlural, pa as paPlural, pl as plPlural, prg as prgPlural, ps as psPlural, pt as ptPlural, ro as roPlural, ru as ruPlural, sc as scPlural, scn as scnPlural, sd as sdPlural, sh as shPlural, si as siPlural, sk as skPlural, sl as slPlural, sq as sqPlural, sr as srPlural, sv as svPlural, sw as swPlural, ta as taPlural, te as tePlural, th as thPlural, tk as tkPlural, tl as tlPlural, tpi as tpiPlural, tr as trPlural, uk as ukPlural, und as undPlural, ur as urPlural, uz as uzPlural, vec as vecPlural, vi as viPlural, yue as yuePlural, zh as zhPlural, zu as zuPlural } from "make-plural/plurals";
 import { af as afOrdinal, am as amOrdinal, an as anOrdinal, ar as arOrdinal, as as asOrdinal, ast as astOrdinal, az as azOrdinal, bal as balOrdinal, be as beOrdinal, bg as bgOrdinal, bn as bnOrdinal, bs as bsOrdinal, ca as caOrdinal, ce as ceOrdinal, cs as csOrdinal, cy as cyOrdinal, da as daOrdinal, de as deOrdinal, dsb as dsbOrdinal, el as elOrdinal, en as enOrdinal, es as esOrdinal, et as etOrdinal, eu as euOrdinal, fa as faOrdinal, fi as fiOrdinal, fil as filOrdinal, fr as frOrdinal, fy as fyOrdinal, ga as gaOrdinal, gd as gdOrdinal, gl as glOrdinal, gsw as gswOrdinal, gu as guOrdinal, he as heOrdinal, hi as hiOrdinal, hr as hrOrdinal, hsb as hsbOrdinal, hu as huOrdinal, hy as hyOrdinal, ia as iaOrdinal, id as idOrdinal, is as isOrdinal, it as itOrdinal, ja as jaOrdinal, ka as kaOrdinal, kk as kkOrdinal, km as kmOrdinal, kn as knOrdinal, ko as koOrdinal, kw as kwOrdinal, ky as kyOrdinal, lij as lijOrdinal, lo as loOrdinal, lt as ltOrdinal, lv as lvOrdinal, mk as mkOrdinal, ml as mlOrdinal, mn as mnOrdinal, mo as moOrdinal, mr as mrOrdinal, ms as msOrdinal, my as myOrdinal, nb as nbOrdinal, ne as neOrdinal, nl as nlOrdinal, no as noOrdinal, or as orOrdinal, pa as paOrdinal, pl as plOrdinal, prg as prgOrdinal, ps as psOrdinal, pt as ptOrdinal, ro as roOrdinal, ru as ruOrdinal, sc as scOrdinal, scn as scnOrdinal, sd as sdOrdinal, sh as shOrdinal, si as siOrdinal, sk as skOrdinal, sl as slOrdinal, sq as sqOrdinal, sr as srOrdinal, sv as svOrdinal, sw as swOrdinal, ta as taOrdinal, te as teOrdinal, th as thOrdinal, tk as tkOrdinal, tl as tlOrdinal, tpi as tpiOrdinal, tr as trOrdinal, uk as ukOrdinal, und as undOrdinal, ur as urOrdinal, uz as uzOrdinal, vec as vecOrdinal, vi as viOrdinal, yue as yueOrdinal, zh as zhOrdinal, zu as zuOrdinal } from "@messageformat/runtime/lib/cardinals";
-export const formatters = { date, time, number };
+export const formatters = { date, time, numberFmt };
 export type MessageArguments<TArgumentType = number | string, TArgumentTagType = (children: TArgumentType) => TArgumentType> = {
   "fn": {
     "currentTime": Date | number | string;
   },
+  "integer": {
+    "amount": number;
+  },
+  "money": {
+    "amount": number;
+  },
   "number": {
     "numCats": number;
+  },
+  "percentage": {
+    "value": number;
   },
   "plural": {
     "count": number;

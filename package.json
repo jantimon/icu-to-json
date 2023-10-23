@@ -1,6 +1,6 @@
 {
   "name": "icu-to-json",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Compile ICU MessageFormat strings to JSON at build time and render them at runtime",
   "main": "dist/runtime.js",
   "types": "dist/runtime.d.ts",
@@ -25,6 +25,7 @@
   ],
   "scripts": {
     "test": "vitest run",
+    "test:watch": "vitest",
     "test:types": "npx --package=@arethetypeswrong/cli attw --pack .",
     "build": "npm run build:runtime && npm run build:compiler && npm run build:cli",
     "build:runtime": "tsup src/runtime.ts --format cjs,esm --dts --minify --clean --sourcemap --out-dir dist",

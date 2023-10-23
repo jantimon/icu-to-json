@@ -28,6 +28,54 @@ exports[`measure size for fn example 1`] = `
 ]
 `;
 
+exports[`measure size for integer example 1`] = `
+[
+  "The integer value of {amount} is {amount, number, integer}",
+  [
+    [
+      "amount",
+    ],
+    "The integer value of ",
+    0,
+    " is ",
+    [
+      4,
+      0,
+      "numberFmt",
+      "integer",
+    ],
+  ],
+  "
+   size (icu message): 60b
+   size (json):        73b
+   overhead:           +22%
+",
+]
+`;
+
+exports[`measure size for money example 1`] = `
+[
+  "Buy now to save {amount, number, currency:GBP}",
+  [
+    [
+      "amount",
+    ],
+    "Buy now to save ",
+    [
+      4,
+      0,
+      "numberFmt",
+      "currency:GBP",
+    ],
+  ],
+  "
+   size (icu message): 48b
+   size (json):        64b
+   overhead:           +33%
+",
+]
+`;
+
 exports[`measure size for number example 1`] = `
 [
   "I have {numCats, number} cats.",
@@ -47,6 +95,30 @@ exports[`measure size for number example 1`] = `
    size (icu message): 32b
    size (json):        47b
    overhead:           +47%
+",
+]
+`;
+
+exports[`measure size for percentage example 1`] = `
+[
+  "You reached {value, number, %} of your goal!",
+  [
+    [
+      "value",
+    ],
+    "You reached ",
+    [
+      4,
+      0,
+      "numberFmt",
+      "percent",
+    ],
+    " of your goal!",
+  ],
+  "
+   size (icu message): 46b
+   size (json):        71b
+   overhead:           +54%
 ",
 ]
 `;

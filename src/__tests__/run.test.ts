@@ -8,13 +8,14 @@ import { type MessageArguments, formatters, en } from "./__snapshots__/cli.test.
 const t = <TKey extends keyof MessageArguments>(
   key: TKey,
   locale: Locale,
-  args: MessageArguments[TKey]
+  args: MessageArguments[TKey],
+  tFormatters = formatters
 ) => {
   return run(
     (messages as any)[locale[0]][key],
     locale,
     args as any,
-    formatters
+    tFormatters
   );
 };
 
@@ -63,8 +64,26 @@ test("tags", () => {
 });
 
 test("number", () => {
-  expect(t("number", en, { numCats: 99 })).toMatchInlineSnapshot(
+  expect(t("number", en, { numCats: 99 }, {} as any)).toMatchInlineSnapshot(
     '"I have 99 cats."'
+  );
+});
+
+test("percentage", () => {
+  expect(t("percentage", en, { value: 0.03935 })).toMatchInlineSnapshot(
+    '"You reached 4% of your goal!"'
+  );
+});
+
+test("money", () => {
+  expect(t("money", en, { amount: 30 })).toMatchInlineSnapshot(
+    '"Buy now to save £30.00"'
+  );
+});
+
+test("integer", () => {
+  expect(t("integer", en, { amount: 99.999 })).toMatchInlineSnapshot(
+    '"The integer value of 99.999 is 100"'
   );
 });
 

@@ -65,6 +65,7 @@ function generateTypes(source: unknown): string {
     plural: "number",
     selectordinal: "number",
     number: "number",
+    numberFmt: "number",
     select: "number | string",
   };
   const recurse = (source: unknown, path?: string) => {
@@ -99,7 +100,7 @@ function generateTypes(source: unknown): string {
     messageFormatFormatters["time"] = "time";
   }
   if (usages.has("number")) {
-    messageFormatFormatters["number"] = "numberFmt as number";
+    messageFormatFormatters["numberFmt"] = "numberFmt";
   }
 
   const imports = [`import type { Locale } from "icu-to-json";`];

@@ -8,7 +8,10 @@
         "fn": "It is now {currentTime, time} on {currentTime, date}",
         "tags": "Wow formatJs allows <b>{dynamic} tags</b>",
         "number": "I have {numCats, number} cats.",
-        "time": "Sale begins {start, time, short} at {start, date, short}"
+        "percentage": "You reached {value, number, %} of your goal!",
+        "money": "Buy now to save {amount, number, currency:GBP}",
+        "time": "Sale begins {start, time, short} at {start, date, short}",
+        "integer": "The integer value of {amount} is {amount, number, integer}"
     },
     "es": {
         "text": "Hola",
@@ -19,7 +22,10 @@
         "fn": "Son las {currentTime, time} del {currentTime, date}",
         "tags": "Wow formatJs permite <b>{dynamic} etiquetas</b>",
         "number": "Tengo {numCats, number} gatos.",
-        "time": "La venta comienza {start, time, short} el {start, date, short}"
+        "percentage": "Has alcanzado el {value, number, %} de tu objetivo!",
+        "money": "Compra ahora para ahorrar {amount, number, currency:EUR}",
+        "time": "La venta comienza {start, time, short} el {start, date, short}",
+        "integer": "El valor entero de {amount} es {amount, number, integer}"
     },
     "fr": {
         "text": "Bonjour",
@@ -30,7 +36,10 @@
         "fn": "Il est maintenant {currentTime, time} le {currentTime, date}",
         "tags": "Wow formatJs permet les <b>{dynamic} balises</b>",
         "number": "J'ai {numCats, number} chats.",
-        "time": "La vente commence {start, time, short} le {start, date, short}"
+        "percentage": "Vous avez atteint {value, number, %} de votre objectif!",
+        "money": "Achetez maintenant pour économiser {amount, number, currency:EUR}",
+        "time": "La vente commence {start, time, short} le {start, date, short}",
+        "integer": "La valeur entière de {amount} est {amount, number, integer}"
     },
     "it": {
         "text": "Ciao",
@@ -41,7 +50,10 @@
         "fn": "Sono le {currentTime, time} del {currentTime, date}",
         "tags": "Wow formatJs permette <b>{dynamic} tag</b>",
         "number": "Ho {numCats, number} gatti.",
-        "time": "La vendita inizia {start, time, short} il {start, date, short}"
+        "percentage": "Hai raggiunto il {value, number, %} del tuo obiettivo!",
+        "money": "Acquista ora per risparmiare {amount, number, currency:EUR}",
+        "time": "La vendita inizia {start, time, short} il {start, date, short}",
+        "integer": "Il valore intero di {amount} è {amount, number, integer}"
     },
     "de": {
         "text": "Hallo",
@@ -52,6 +64,9 @@
         "fn": "Es ist jetzt {currentTime, time} am {currentTime, date}",
         "tags": "Wow, formatJs erlaubt <b>{dynamic} Tags</b>",
         "number": "Ich habe {numCats, number} Katzen.",
-        "time": "Der Verkauf beginnt {start, time, short} am {start, date, short}"
+        "percentage": "Du hast {value, number, %} deines Ziels erreicht!",
+        "money": "Jetzt kaufen und {amount, number, currency:EUR} sparen",
+        "time": "Der Verkauf beginnt {start, time, short} am {start, date, short}",
+        "integer": "Der Ganzzahlwert von {amount} ist {amount, number, integer}"
     }
 }

@@ -1,5 +1,5 @@
 import { parse, TYPE } from "@formatjs/icu-messageformat-parser";
-import type { MessageFormatElement } from "@formatjs/icu-messageformat-parser";
+import type { MessageFormatElement, NumberSkeleton } from "@formatjs/icu-messageformat-parser";
 import {
   CompiledArgList,
   CompiledAst,
@@ -82,11 +82,16 @@ const compileAst = (ast: Ast, args: string[]): CompiledAstContents[] => {
           ...(node.style !== null ? [node.style] : []),
         ] satisfies CompiledFn;
       case TYPE.number:
-        return [
+
+        return (node.style === null) ? [
           JSON_AST_TYPE_FN,
           args.indexOf(node.value),
           "number",
-          ...(node.style !== null ? [node.style] : []),
+        ] satisfies CompiledFn : [
+          JSON_AST_TYPE_FN,
+          args.indexOf(node.value),
+          "numberFmt",
+          getNumberFormat(node.style),
         ] satisfies CompiledFn;
       default:
         console.log(node);
@@ -101,6 +106,7 @@ export type ArgumentUsage =
   | "select"
   | "selectordinal"
   | "number"
+  | "numberFmt"
   | "date"
   | "time"
   | "plural";
@@ -113,7 +119,11 @@ const getAllArguments = (ast: Ast) => {
       case TYPE.pound:
         break;
       case TYPE.number:
-        args[node.value] = addIfNotExists(args[node.value], "number");
+        if (node.style === null) {
+          args[node.value] = addIfNotExists(args[node.value], "number");
+        } else {
+          args[node.value] = addIfNotExists(args[node.value], "numberFmt");
+        }
         break;
       case TYPE.date:
         args[node.value] = addIfNotExists(args[node.value], "date");
@@ -147,6 +157,13 @@ const getAllArguments = (ast: Ast) => {
   ast.forEach(getArgs);
   return args;
 };
+
+function getNumberFormat(style: string | NumberSkeleton | undefined) {
+  if (style === "%") {
+    return "percent"
+  }
+  return style;
+}
 
 function addIfNotExists<T>(array: T[] | undefined, item: T) {
   if (array === undefined) {
