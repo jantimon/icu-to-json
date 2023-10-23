@@ -37,13 +37,15 @@
   "author": "Jan Nicklas",
   "license": "MIT",
   "dependencies": {
+    "@formatjs/icu-messageformat-parser": "2.7.0",
     "@messageformat/runtime": "3.0.1",
-    "make-plural": "7.3.0",
-    "@formatjs/icu-messageformat-parser": "2.7.0"
+    "make-plural": "7.3.0"
   },
   "devDependencies": {
+    "@types/yargs-parser": "^21.0.2",
     "tsup": "7.2.0",
+    "typescript": "5.2.2",
     "vitest": "0.34.6",
-    "typescript": "5.2.2"
+    "yargs-parser": "^21.1.1"
   }
 }
