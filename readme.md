@@ -4,7 +4,8 @@
 
 Precompile i18n [icu syntax](https://formatjs.io/docs/core-concepts/icu-syntax) translations to JSON at build time and render them at runtime
 
-For example: `Hello {name}` → `["Hello ", 0]` → `Hello, World`
+Build Time: `Hello {name}` → `["Hello ", 0]`  
+Run Time: `["Hello ", 0]` + `"World"` → `"Hello World"`
 
 ![icu-to-json logo](https://raw.githubusercontent.com/jantimon/icu-to-json/main/docs/logo.jpg)
 
@@ -23,7 +24,7 @@ Therefore this library provides a way to compile ICU MessageFormat strings to co
 2. **No parsing at runtime**  
  The precompiled JSON can be rendered without any string parsing at runtime
 3. **Flexible**  
- The runtime is able to not only return strings but also richtext elements (e.g. JSX)
+ The runtime is able to not only return strings but also any object (aka rich text elements like JSX)
 4. **Types**  
  The compiler has an optional feature to generate typescript types for the ICU messages and their arguments
 
