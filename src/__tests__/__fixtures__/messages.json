@@ -22,10 +22,10 @@
     },
     "select": {
         "en": "Hello, Your friend {friend} is now online. {gender, select, female {She} male {He} other {They}} added a new image to the system.",
-        "es": "Hola, Tu amigo {friend} ahora está en línea. {gender, select, female {She} male {He} other {They}} agregó una nueva imagen al sistema.",
-        "fr": "Bonjour, Votre ami {friend} est maintenant en ligne. {gender, select, female {She} male {He} other {They}} a ajouté une nouvelle image au système.",
-        "it": "Ciao, Il tuo amico {friend} è ora online. {gender, select, female {She} male {He} other {Loro}} ha aggiunto una nuova immagine al sistema.",
-        "de-DE": "Hallo, Dein Freund {friend} ist jetzt online. {gender, select, female {She} male {He} other {They}} hat ein neues Bild zum System hinzugefügt."
+        "es": "Hola, Tu amigo {friend} ahora está en línea. {gender, select, female {Ella} male {Él} other {Ellos}} agregaron una nueva imagen al sistema.",
+        "fr": "Bonjour, Votre ami {friend} est maintenant en ligne. {gender, select, female {Elle} male {Il} other {Ils}} ont ajouté une nouvelle image au système.",
+        "it": "Ciao, Il tuo amico {friend} è ora online. {gender, select, female {Lei} male {Lui} other {Loro}} hanno aggiunto una nuova immagine al sistema.",
+        "de-DE": "Hallo, Dein Freund {friend} ist jetzt online. {gender, select, female {Sie} male {Er} other {Sie}} hat ein neues Bild zum System hinzugefügt."
     },
     "selectordinal": {
         "en": "You finished {place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}!",
