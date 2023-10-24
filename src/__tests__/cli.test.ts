@@ -14,7 +14,7 @@ afterEach(() => {
 });
 
 test("cli compile", async() => {
-    await cli(resolve(__dirname, "__fixtures__/messages.json"), resolve(__dirname, "__snapshots__/cli.test.messages.json"), false);
+    await cli(resolve(__dirname, "__fixtures__/messages.json"), resolve(__dirname, "__snapshots__/cli.test.messages.json"), false, true);
 });
 
 test("cli --types", async() => {

@@ -2,7 +2,8 @@ import { compileToJson } from "../compiler.js";
 import { test, expect } from "vitest";
 import messages from "./__fixtures__/messages.json";
 
-test.each(Object.entries(messages.en))(`measure size for %s example`, (testName, icuMessage) => {
+const englishTranslations = Object.entries(messages).map(([word, langTranslation]) => [word, langTranslation.en] );
+test.each(englishTranslations)(`measure size for %s example`, (testName, icuMessage) => {
     const json = compileToJson(icuMessage);
     const size = JSON.stringify(icuMessage).length;
     const jsonSize = JSON.stringify(json).length;

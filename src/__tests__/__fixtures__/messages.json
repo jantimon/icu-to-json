@@ -1,72 +1,86 @@
 {
-    "en": {
-        "text": "Hello",
-        "variable": "{name} has just entered the chat",
-        "plural": "{count, plural, one {# image} other {# images} }",
-        "select": "Hello, Your friend {friend} is now online. {gender, select, female {She} male {He} other {They}} added a new image to the system.",
-        "selectordinal": "You finished {place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}!",
-        "fn": "It is now {currentTime, time} on {currentTime, date}",
-        "tags": "Wow formatJs allows <b>{dynamic} tags</b>",
-        "number": "I have {numCats, number} cats.",
-        "percentage": "You reached {value, number, %} of your goal!",
-        "money": "Buy now to save {amount, number, currency:GBP}",
-        "time": "Sale begins {start, time, short} at {start, date, short}",
-        "integer": "The integer value of {amount} is {amount, number, integer}"
+    "text": {
+        "en": "Hello",
+        "es": "Hola",
+        "fr": "Bonjour",
+        "it": "Ciao",
+        "de-DE": "Hallo"
     },
-    "es": {
-        "text": "Hola",
-        "variable": "{name} acaba de entrar al chat",
-        "plural": "{count, plural, one {# imagen} other {# imágenes} }",
-        "select": "Hola, Tu amigo {friend} ahora está en línea. {gender, select, female {She} male {He} other {They}} agregó una nueva imagen al sistema.",
-        "selectordinal": "¡Terminaste en el {place, selectordinal, one {#er} two {#do} few {#ro} other {#to}} lugar!",
-        "fn": "Son las {currentTime, time} del {currentTime, date}",
-        "tags": "Wow formatJs permite <b>{dynamic} etiquetas</b>",
-        "number": "Tengo {numCats, number} gatos.",
-        "percentage": "Has alcanzado el {value, number, %} de tu objetivo!",
-        "money": "Compra ahora para ahorrar {amount, number, currency:EUR}",
-        "time": "La venta comienza {start, time, short} el {start, date, short}",
-        "integer": "El valor entero de {amount} es {amount, number, integer}"
+    "variable": {
+        "en": "{name} has just entered the chat",
+        "es": "{name} acaba de entrar al chat",
+        "fr": "{name} vient d'entrer dans le chat",
+        "it": "{name} è appena entrato nella chat",
+        "de-DE": "{name} ist gerade dem Chat beigetreten"
     },
-    "fr": {
-        "text": "Bonjour",
-        "variable": "{name} vient d'entrer dans le chat",
-        "plural": "{count, plural, one {# image} other {# images} }",
-        "select": "Bonjour, Votre ami {friend} est maintenant en ligne. {gender, select, female {She} male {He} other {They}} a ajouté une nouvelle image au système.",
-        "selectordinal": "Vous avez terminé {place, selectordinal, one {#er} two {#ème} few {#ème} other {#ème}}!",
-        "fn": "Il est maintenant {currentTime, time} le {currentTime, date}",
-        "tags": "Wow formatJs permet les <b>{dynamic} balises</b>",
-        "number": "J'ai {numCats, number} chats.",
-        "percentage": "Vous avez atteint {value, number, %} de votre objectif!",
-        "money": "Achetez maintenant pour économiser {amount, number, currency:EUR}",
-        "time": "La vente commence {start, time, short} le {start, date, short}",
-        "integer": "La valeur entière de {amount} est {amount, number, integer}"
+    "plural": {
+        "en": "{count, plural, one {# image} other {# images} }",
+        "es": "{count, plural, one {# imagen} other {# imágenes} }",
+        "fr": "{count, plural, one {# image} other {# images} }",
+        "it": "{count, plural, one {# immagine} other {# immagini} }",
+        "de-DE": "{count, plural, one {# Bild} other {# Bilder} }"
     },
-    "it": {
-        "text": "Ciao",
-        "variable": "{name} è appena entrato nella chat",
-        "plural": "{count, plural, one {# immagine} other {# immagini} }",
-        "select": "Ciao, Il tuo amico {friend} è ora online. {gender, select, female {She} male {He} other {Loro}} ha aggiunto una nuova immagine al sistema.",
-        "selectordinal": "Hai finito al {place, selectordinal, one {#°} other {#°}} posto!",
-        "fn": "Sono le {currentTime, time} del {currentTime, date}",
-        "tags": "Wow formatJs permette <b>{dynamic} tag</b>",
-        "number": "Ho {numCats, number} gatti.",
-        "percentage": "Hai raggiunto il {value, number, %} del tuo obiettivo!",
-        "money": "Acquista ora per risparmiare {amount, number, currency:EUR}",
-        "time": "La vendita inizia {start, time, short} il {start, date, short}",
-        "integer": "Il valore intero di {amount} è {amount, number, integer}"
+    "select": {
+        "en": "Hello, Your friend {friend} is now online. {gender, select, female {She} male {He} other {They}} added a new image to the system.",
+        "es": "Hola, Tu amigo {friend} ahora está en línea. {gender, select, female {She} male {He} other {They}} agregó una nueva imagen al sistema.",
+        "fr": "Bonjour, Votre ami {friend} est maintenant en ligne. {gender, select, female {She} male {He} other {They}} a ajouté une nouvelle image au système.",
+        "it": "Ciao, Il tuo amico {friend} è ora online. {gender, select, female {She} male {He} other {Loro}} ha aggiunto una nuova immagine al sistema.",
+        "de-DE": "Hallo, Dein Freund {friend} ist jetzt online. {gender, select, female {She} male {He} other {They}} hat ein neues Bild zum System hinzugefügt."
     },
-    "de": {
-        "text": "Hallo",
-        "variable": "{name} ist gerade dem Chat beigetreten",
-        "plural": "{count, plural, one {# Bild} other {# Bilder} }",
-        "select": "Hallo, Dein Freund {friend} ist jetzt online. {gender, select, female {She} male {He} other {They}} hat ein neues Bild zum System hinzugefügt.",
-        "selectordinal": "Du hast den {place, selectordinal, other {#ten}} Platz erreicht!",
-        "fn": "Es ist jetzt {currentTime, time} am {currentTime, date}",
-        "tags": "Wow, formatJs erlaubt <b>{dynamic} Tags</b>",
-        "number": "Ich habe {numCats, number} Katzen.",
-        "percentage": "Du hast {value, number, %} deines Ziels erreicht!",
-        "money": "Jetzt kaufen und {amount, number, currency:EUR} sparen",
-        "time": "Der Verkauf beginnt {start, time, short} am {start, date, short}",
-        "integer": "Der Ganzzahlwert von {amount} ist {amount, number, integer}"
+    "selectordinal": {
+        "en": "You finished {place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}!",
+        "es": "¡Terminaste en el {place, selectordinal, one {#er} two {#do} few {#ro} other {#to}} lugar!",
+        "fr": "Vous avez terminé {place, selectordinal, one {#er} two {#ème} few {#ème} other {#ème}}!",
+        "it": "Hai finito al {place, selectordinal, one {#°} other {#°}} posto!",
+        "de-DE": "Du hast den {place, selectordinal, other {#ten}} Platz erreicht!"
+    },
+    "fn": {
+        "en": "It is now {currentTime, time} on {currentTime, date}",
+        "es": "Son las {currentTime, time} del {currentTime, date}",
+        "fr": "Il est maintenant {currentTime, time} le {currentTime, date}",
+        "it": "Sono le {currentTime, time} del {currentTime, date}",
+        "de-DE": "Es ist jetzt {currentTime, time} am {currentTime, date}"
+    },
+    "tags": {
+        "en": "Wow formatJs allows <b>{dynamic} tags</b>",
+        "es": "Wow formatJs permite <b>{dynamic} etiquetas</b>",
+        "fr": "Wow formatJs permet les <b>{dynamic} balises</b>",
+        "it": "Wow formatJs permette <b>{dynamic} tag</b>",
+        "de-DE": "Wow, formatJs erlaubt <b>{dynamic} Tags</b>"
+    },
+    "number": {
+        "en": "I have {numCats, number} cats.",
+        "es": "Tengo {numCats, number} gatos.",
+        "fr": "J'ai {numCats, number} chats.",
+        "it": "Ho {numCats, number} gatti.",
+        "de-DE": "Ich habe {numCats, number} Katzen."
+    },
+    "percentage": {
+        "en": "You reached {value, number, %} of your goal!",
+        "es": "Has alcanzado el {value, number, %} de tu objetivo!",
+        "fr": "Vous avez atteint {value, number, %} de votre objectif!",
+        "it": "Hai raggiunto il {value, number, %} del tuo obiettivo!",
+        "de-DE": "Du hast {value, number, %} deines Ziels erreicht!"
+    },
+    "money": {
+        "en": "Buy now to save {amount, number, currency:GBP}",
+        "es": "Compra ahora para ahorrar {amount, number, currency:EUR}",
+        "fr": "Achetez maintenant pour économiser {amount, number, currency:EUR}",
+        "it": "Acquista ora per risparmiare {amount, number, currency:EUR}",
+        "de-DE": "Jetzt kaufen und {amount, number, currency:EUR} sparen"
+    },
+    "time": {
+        "en": "Sale begins {start, time, short} at {start, date, short}",
+        "es": "La venta comienza {start, time, short} el {start, date, short}",
+        "fr": "La vente commence {start, time, short} le {start, date, short}",
+        "it": "La vendita inizia {start, time, short} il {start, date, short}",
+        "de-DE": "Der Verkauf beginnt {start, time, short} am {start, date, short}"
+    },
+    "integer": {
+        "en": "The integer value of {amount} is {amount, number, integer}",
+        "es": "El valor entero de {amount} es {amount, number, integer}",
+        "fr": "La valeur entière de {amount} est {amount, number, integer}",
+        "it": "Il valore intero di {amount} è {amount, number, integer}",
+        "de-DE": "Der Ganzzahlwert von {amount} ist {amount, number, integer}"
     }
 }

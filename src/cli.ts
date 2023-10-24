@@ -1,114 +1,15 @@
 import { mkdir, readFile, writeFile } from "fs/promises";
 import { dirname } from "path";
 import { ArgumentUsage, compile, compileToJson } from "./compiler.js";
+import { availableLanguages } from "./messageformat/languages.js";
 import yargs from "yargs-parser";
 
-const availableLanguages = [
-    "af",
-    "am",
-    "an",
-    "ar",
-    "as",
-    "ast",
-    "az",
-    "bal",
-    "be",
-    "bg",
-    "bn",
-    "bs",
-    "ca",
-    "ce",
-    "cs",
-    "cy",
-    "da",
-    "de",
-    "dsb",
-    "el",
-    "en",
-    "es",
-    "et",
-    "eu",
-    "fa",
-    "fi",
-    "fil",
-    "fr",
-    "fy",
-    "ga",
-    "gd",
-    "gl",
-    "gsw",
-    "gu",
-    "he",
-    "hi",
-    "hr",
-    "hsb",
-    "hu",
-    "hy",
-    "ia",
-    "id",
-    "is",
-    "it",
-    "ja",
-    "ka",
-    "kk",
-    "km",
-    "kn",
-    "ko",
-    "kw",
-    "ky",
-    "lij",
-    "lo",
-    "lt",
-    "lv",
-    "mk",
-    "ml",
-    "mn",
-    "mo",
-    "mr",
-    "ms",
-    "my",
-    "nb",
-    "ne",
-    "nl",
-    "no",
-    "or",
-    "pa",
-    "pl",
-    "prg",
-    "ps",
-    "pt",
-    "ro",
-    "ru",
-    "sc",
-    "scn",
-    "sd",
-    "sh",
-    "si",
-    "sk",
-    "sl",
-    "sq",
-    "sr",
-    "sv",
-    "sw",
-    "ta",
-    "te",
-    "th",
-    "tk",
-    "tl",
-    "tpi",
-    "tr",
-    "uk",
-    "und",
-    "ur",
-    "uz",
-    "vec",
-    "vi",
-    "yue",
-    "zh",
-    "zu",
-  ];
+type Options = Partial<{
+  languages: string[],
+  formatters: boolean,
+}>
 
-export async function cli(input: string, output: string, types: boolean, languages: string[] = availableLanguages) {
+export async function cli(input: string, output: string, types: boolean, normalizeJson?: boolean, options: Options = {}) {
   if (!input || !output) {
     console.error("Usage: icu-to-json input.js output.json");
     process.exit(1);
@@ -120,22 +21,23 @@ export async function cli(input: string, output: string, types: boolean, languag
   const source = await readFile(input, "utf8");
   const json = JSON.parse(source);
   const result = types
-    ? generateTypes(json, languages)
-    : JSON.stringify(replaceStringsInFile(json, compileToJson));
+    ? generateDictionaryApi(json, options)
+    : JSON.stringify(replaceStringsInFile(normalizeJson ? normalize(json) : json, compileToJson));
+
   await mkdir(dirname(output), { recursive: true });
   await writeFile(output, result);
   console.log(`Wrote ${output}`);
 }
 
 
-if (String(process.argv[1]).match(/(icu-to-json|cli)\.(js|ts)$/)) {
+if (String(process.argv[1]).match(/(icu-to-json|cli)(\.(js|ts|cmd)|)$/)) {
   const argv = yargs(process.argv.slice(2), {
-    boolean: ["types"],
+    boolean: ["types", "formatters", "normalize"],
     array: ["lang"]
   });
   const langArg = (argv.lang as string[]).join(",").split(",").filter(Boolean).filter((lang) => availableLanguages.includes(lang.split("-")[0]));
-  const lang = langArg.length ? langArg : availableLanguages;
-  cli(argv[0], argv[1], argv.types, lang);
+  const languages = langArg.length ? langArg : availableLanguages;
+  cli(argv[0], argv[1], argv.types, argv.normalize,{ languages, formatters: argv.formatters });
 }
 
 /**
@@ -162,10 +64,8 @@ function replaceStringsInFile(
   return source;
 }
 
-function generateTypes(source: unknown, languages: string[]): string {
-  if (typeof source !== "object" || source === null) {
-    throw new Error("Invalid input");
-  }
+function generateDictionaryApi(source: unknown, options: Options = {}): string {
+  const dictionary = normalize(source);
   const usages = new Set<ArgumentUsage>();
   const typeMap = new Map<string, Record<string, string>>();
   const typeMapping: Record<ArgumentUsage, string> = {
@@ -179,56 +79,58 @@ function generateTypes(source: unknown, languages: string[]): string {
     numberFmt: "number",
     select: "number | string",
   };
-  const recurse = (source: unknown, path?: string) => {
-    if (typeof source === "string" && path !== undefined) {
-      const keyArgumentsFromMap = typeMap.get(path);
-      const keyArguments = keyArgumentsFromMap || {};
-      if (!keyArgumentsFromMap) {
-        typeMap.set(path, keyArguments);
+
+  Object.values(dictionary).forEach((keyWord) => {
+    Object.entries(keyWord).forEach(([translationKey, translation]) => {
+      const compiled = compile(translation);
+      const typeMapForTranslation = typeMap.get(translationKey);
+      const typeMapForTranslationArgs = typeMapForTranslation || {};
+      if (!typeMapForTranslation) {
+        typeMap.set(translationKey, typeMapForTranslationArgs);
       }
-      const compiled = compile(source);
       Object.entries(compiled.args).forEach(([arg, argType]) => {
-        keyArguments[arg] =
-          typeMapping[
-            argType.filter((usage) => usage !== "argument")[0] || "argument"
-          ];
+        typeMapForTranslationArgs[arg] =  typeMapping[
+          argType.filter((usage) => usage !== "argument")[0] || "argument"
+          ]
         argType.forEach((usage) => usages.add(usage));
       });
-    } else if (Array.isArray(source)) {
-      source.forEach((item, index) => recurse(item));
-    } else if (typeof source === "object" && source !== null) {
-      Object.entries(source).forEach(([key, value]) => recurse(value, key));
-    }
-  };
+    });
+  });
 
-  recurse(source);
-
-  const messageFormatFormatters: Record<string, string> = {};
-  if (usages.has("date")) {
-    messageFormatFormatters["date"] = "date";
-  }
-  if (usages.has("time")) {
-    messageFormatFormatters["time"] = "time";
-  }
-  if (usages.has("number")) {
-    messageFormatFormatters["numberFmt"] = "numberFmt";
-  }
+  const usedLanguages = Object.keys(dictionary);
+  const languageWithRegions = (options.languages || usedLanguages || availableLanguages).sort();
+  const languages = [...new Set(languageWithRegions.map((lang) => lang.split("-")[0]))];
+  const withFormatters = options.formatters !== false;
 
   const imports = [`import type { Locale } from "icu-to-json";`];
+  const code = [];
 
-  if (Object.keys(messageFormatFormatters).length) {
-    imports.push(
-      `import { ${Object.values(messageFormatFormatters).join(
-        ", "
-      )} } from "@messageformat/runtime/lib/formatters";`
+  if (withFormatters) {
+    const messageFormatFormatters: Record<string, string> = {};
+    if (usages.has("date")) {
+      messageFormatFormatters["date"] = "date";
+    }
+    if (usages.has("time")) {
+      messageFormatFormatters["time"] = "time";
+    }
+    if (usages.has("number")) {
+      messageFormatFormatters["numberFmt"] = "numberFmt";
+    }
+    if (Object.keys(messageFormatFormatters).length) {
+      imports.push(
+        `import { ${Object.values(messageFormatFormatters).join(
+          ", "
+        )} } from "@messageformat/runtime/lib/formatters";`
+      );
+    }
+    code.push(`export const formatters = { ${Object.keys(
+      messageFormatFormatters
+    ).join(", ")} };`
     );
   }
 
-  const formatters = `export const formatters = { ${Object.keys(
-    messageFormatFormatters
-  ).join(", ")} };`;
-
-  const types = `export type MessageArguments<TArgumentType = number | string, TArgumentTagType = (children: TArgumentType) => TArgumentType> = {\n  ${[
+  // MessageArguments Type
+  code.push(`export type MessageArguments<TArgumentType = number | string, TArgumentTagType = (children: TArgumentType) => TArgumentType> = {\n  ${[
     ...typeMap.entries(),
   ]
     .sort()
@@ -237,13 +139,15 @@ function generateTypes(source: unknown, languages: string[]): string {
       if (!keyArguments.length) {
         return `${JSON.stringify(key)}?: never | Record<string, never>`;
       }
-      return `${JSON.stringify(key)}: {\n    ${
-        keyArguments.map((argument) => {
-          return `${JSON.stringify(argument)}: ${args[argument]};`;
-        })
+      return `${JSON.stringify(key)}: {\n    ${keyArguments.map((argument) => {
+        return `${JSON.stringify(argument)}: ${args[argument]};`;
+      })
         .join("\n    ")}\n  }`;
     })
-    .join(",\n  ")}\n};`;
+    .join(",\n  ")}\n};`);
+
+  // Language type
+  code.push(`export type Language = ${languageWithRegions.map((lang) => JSON.stringify(lang)).join(" | ")};`);
 
   const pluralImports = languages.map(
     (language) => language + " as " + language + "Plural"
@@ -265,7 +169,7 @@ function generateTypes(source: unknown, languages: string[]): string {
     );
   }
 
-  const locales = languages.map((language) => {
+  code.push(...languages.map((language) => {
     const lang = JSON.stringify(language);
     const plural = usages.has("plural") ? language + "Plural" : (usages.has("selectordinal") ? "null" : undefined);
     const ordinal = usages.has("selectordinal")
@@ -274,7 +178,94 @@ function generateTypes(source: unknown, languages: string[]): string {
     const localeParts = [lang, plural, ordinal].filter(Boolean);
 
     return `export const ${language}: Locale = [${localeParts.join(", ")}]${localeParts.length !== 3 ? " as any" : ""};`;
-  });
+  }));
 
-  return `${imports.join("\n")}\n${formatters}\n${types}\n${locales.join("\n")}`;
+
+  // const locales = { en, de, ... };
+  code.push(`const locales = {${languages.map((language) => {
+    const plural = usages.has("plural") ? language + "Plural" : (usages.has("selectordinal") ? "null" : undefined);
+    const ordinal = usages.has("selectordinal")
+      ? language + "Ordinal"
+      : undefined;
+    const localeParts = [plural, ordinal].filter(Boolean);
+    return `${language}: [${localeParts.join(", ")}]${localeParts.length !== 2 ? " as any" : ""}`;
+  }).join(", ")}} as const;`);
+
+
+  // t function
+  code.push("\n");
+  imports.push(`import { type CompiledAst, evaluateAst, run } from "icu-to-json";`);
+  code.push(`const getLocale = (lang: Language) => [lang, ...locales[lang.split("-")[0] as keyof typeof locales]] as Locale;`);
+  code.push(`/**
+  * This function is used to create a translation function that returns a string
+  */`,
+    `export const createTranslationFn = (messages: Record<string, unknown>, lang: Language) => {
+  const locale = getLocale(lang);
+  return <TKey extends keyof MessageArguments>(key: TKey, args: MessageArguments[TKey]): string => run(messages[key] as CompiledAst, locale, args as Record<string, string | number | Date>, formatters);
+};`
+  );
+  code.push(
+    `/**
+  * This function is used to create a translation function that returns a rich AST
+  */`,
+    `export const createTranslationRitchFn = (messages: Record<string, unknown>, lang: Language, childPreprocessor?: (children: unknown) => any) => {
+  const locale = getLocale(lang);
+  const richFormatters = {...formatters, children: childPreprocessor}${/* TODO - fix formatter typings */" as any"};
+  return <TKey extends keyof MessageArguments>(key: TKey, args: MessageArguments[TKey]) => evaluateAst(messages[key] as CompiledAst, locale, args as Record<string, string | number | Date>, richFormatters);
+};`
+  );
+
+  return `${imports.join("\n")}\n${code.join("\n")}`;
+}
+
+/**
+ * Normalize JSON structure to { "en-UK": { "translationKey": "icu text" } } format
+ * 
+ * Supported formats:
+ * - `{ en: { ... }, "en-UK": { ... } }`
+ * - `{ wordA: { en: { ... }, "en-UK": { ... } }, wordB: { en: { ... }, "en-UK": { ... } } }`
+ * - `{ pageX: { wordA: { en: { ... }, "en-UK": { ... } }, wordB: { en: { ... }, "en-UK": { ... } } } }`
+ * - `{ pageX: { { en: { ... }, "en-UK": { ... } } }`
+ */
+function normalize(source: unknown): Record<string, Record<string, string>> {
+  if (typeof source !== "object" || source === null) {
+    throw new Error(`Invalid format - supported formats: { en: { ... }, "en-UK": { ... } } or { wordA: { en: { ... }, "en-UK": { ... } }, wordB: { en: { ... }, "en-UK": { ... } } }`);
+  }
+  const entries = Object.entries(source);
+  const firstLevel = new Set<string>();
+  const secondLevel = new Set<string>();
+  entries.forEach(([key, value]) => {
+    if (typeof value !== "object" || value === null) {
+      throw new Error(`Invalid format - supported formats: { en: { ... }, "en-UK": { ... } } or { wordA: { en: { ... }, "en-UK": { ... } }, wordB: { en: { ... }, "en-UK": { ... } } }`);
+    }
+    firstLevel.add(key);
+    Object.keys(value).forEach((key) => secondLevel.add(key));
+  });
+  // Is it already normalized?
+  const firstLevelContainsOnlyLanguages = [...firstLevel].every((key) => availableLanguages.includes(key.split("-")[0]));
+  if (firstLevelContainsOnlyLanguages) {
+    return source as Record<string, Record<string, string>>;
+  }
+  // Flip the structure - word <-> language
+  const secondLevelContainsOnlyLanguages = [...secondLevel].every((key) => availableLanguages.includes(key.split("-")[0]));
+  if (secondLevelContainsOnlyLanguages) {
+    const result: Record<string, Record<string, string>> = {};
+    entries.forEach(([key, value]) => {
+      Object.entries(value).forEach(([lang, translation]) => {
+        result[lang] = { ...result[lang], [key]: translation as string };
+      });
+    });
+    return result;
+  }
+  // Try deeper nesting
+  const result: Record<string, Record<string, string>> = {};
+  entries.forEach(([key, value]) => {
+    Object.entries(normalize(value)).forEach(([key, value]) => {
+      result[key] = {...result[key], ...value};
+    });
+  });
+  if (Object.keys(result).length) {
+    return result;
+  }
+  throw new Error(`Invalid format - supported formats: { en: { ... }, "en-UK": { ... } } or { wordA: { en: { ... }, "en-UK": { ... } }, wordB: { en: { ... }, "en-UK": { ... } } }`);
 }

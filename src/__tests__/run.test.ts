@@ -1,57 +1,46 @@
 import { expect, test } from "vitest";
 import { compileToJson } from "../compiler.js";
-import { Locale, evaluateAst, run } from "../runtime.js";
+import { evaluateAst } from "../runtime.js";
+import { createTranslationFn, en } from "./__snapshots__/cli.test.messages.js";
 import messages from "./__snapshots__/cli.test.messages.json";
-import { type MessageArguments, formatters, en } from "./__snapshots__/cli.test.messages.js";
 
 // example t implementation:
-const t = <TKey extends keyof MessageArguments>(
-  key: TKey,
-  locale: Locale,
-  args: MessageArguments[TKey],
-  tFormatters = formatters
-) => {
-  return run(
-    (messages as any)[locale[0]][key],
-    locale,
-    args as any,
-    tFormatters
-  );
-};
+const t = createTranslationFn(messages.en, "en");
+const tDe = createTranslationFn(messages["de-DE"], "de-DE");
 
 test("text", () => {
-  expect(t("text", en, {})).toMatchInlineSnapshot('"Hello"');
+  expect(t("text", {})).toMatchInlineSnapshot('"Hello"');
 });
 
 test("variable", () => {
-  expect(t("variable", en, { name: "Elvis" })).toMatchInlineSnapshot(
+  expect(t("variable", { name: "Elvis" })).toMatchInlineSnapshot(
     '"Elvis has just entered the chat"'
   );
 });
 
 test("plural", () => {
-  expect(t("plural", en, { count: 1 })).toMatchInlineSnapshot(
+  expect(t("plural", { count: 1 })).toMatchInlineSnapshot(
     '"1 image"'
   );
 });
 
 test("select", () => {
   expect(
-    t("select", en, { friend: "Alex", gender: "female" })
+    t("select", { friend: "Alex", gender: "female" })
   ).toMatchInlineSnapshot(
     '"Hello, Your friend Alex is now online. She added a new image to the system."'
   );
 });
 
 test("selectordinal", () => {
-  expect(t("selectordinal", en, { place: 3 })).toMatchInlineSnapshot(
+  expect(t("selectordinal", { place: 3 })).toMatchInlineSnapshot(
     '"You finished 3th!"'
   );
 });
 
 test("fn", () => {
   expect(
-    t("fn", en, { currentTime: new Date("2020-02-02 02:02:02") })
+    t("fn", { currentTime: new Date("2020-02-02 02:02:02") })
   ).toMatchInlineSnapshot(
     '"It is now 2:02:02 AM on Feb 2, 2020"'
   );
@@ -59,39 +48,45 @@ test("fn", () => {
 
 test("tags", () => {
   expect(
-    t("tags", en, { b: (children) => `**${children}**`, dynamic: "⭐️" })
+    t("tags", { b: (children) => `**${children}**`, dynamic: "⭐️" })
   ).toMatchInlineSnapshot('"Wow formatJs allows **⭐️ tags**"');
 });
 
 test("number", () => {
-  expect(t("number", en, { numCats: 99 }, {} as any)).toMatchInlineSnapshot(
+  expect(t("number", { numCats: 99 })).toMatchInlineSnapshot(
     '"I have 99 cats."'
   );
 });
 
 test("percentage", () => {
-  expect(t("percentage", en, { value: 0.03935 })).toMatchInlineSnapshot(
+  expect(t("percentage", { value: 0.03935 })).toMatchInlineSnapshot(
     '"You reached 4% of your goal!"'
   );
 });
 
 test("money", () => {
-  expect(t("money", en, { amount: 30 })).toMatchInlineSnapshot(
+  expect(t("money", { amount: 30 })).toMatchInlineSnapshot(
     '"Buy now to save £30.00"'
   );
 });
 
 test("integer", () => {
-  expect(t("integer", en, { amount: 99.999 })).toMatchInlineSnapshot(
+  expect(t("integer", { amount: 99.999 })).toMatchInlineSnapshot(
     '"The integer value of 99.999 is 100"'
   );
 });
 
 test("time", () => {
   expect(
-    t("time", en, { start: new Date("2020-02-02 02:02:02") })
+    t("time", { start: new Date("2020-02-02 02:02:02") })
   ).toMatchInlineSnapshot(
     '"Sale begins 2:02 AM at 2/2/2020"'
+  );
+});
+
+test("selectordinal DE", () => {
+  expect(tDe("selectordinal", { place: 3 })).toMatchInlineSnapshot(
+    '"Du hast den 3ten Platz erreicht!"'
   );
 });
 

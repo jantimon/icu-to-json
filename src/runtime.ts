@@ -1,7 +1,8 @@
 import { number, plural, select } from "./messageformat/runtime.js";
 
 import { type PluralCategory } from "@messageformat/runtime/lib/cardinals";
-import { CompiledAst, CompiledAstContents, JSON_AST_TYPE_FN, JSON_AST_TYPE_PLURAL, JSON_AST_TYPE_SELECT, JSON_AST_TYPE_SELECTORDINAL, JSON_AST_TYPE_TAG } from "./constants.js";
+import { type CompiledAst, type CompiledAstContents, JSON_AST_TYPE_FN, JSON_AST_TYPE_PLURAL, JSON_AST_TYPE_SELECT, JSON_AST_TYPE_SELECTORDINAL, JSON_AST_TYPE_TAG } from "./constants.js";
+export type { CompiledAst } from "./constants.js";
 
 /**
  * Given a precompiled compiled ICU message JSON, return the evaluated string.
