@@ -4,8 +4,8 @@
 
 Precompile i18n [icu syntax](https://formatjs.io/docs/core-concepts/icu-syntax) translations to JSON at build time and render them at runtime
 
-Build Time: `Hello {name}` → `["Hello ", 0]`  
-Run Time: `["Hello ", 0]` + `"World"` → `"Hello World"`
+Build Time: `compile("Hello {name}")` → `[["name"],"Hello ",0]`  
+Run Time: `run( [["name"],"Hello ",0], { name: "World"} )` → `"Hello World"`
 
 ![icu-to-json logo](https://raw.githubusercontent.com/jantimon/icu-to-json/main/docs/logo.jpg)
 
@@ -46,22 +46,20 @@ npm install icu-to-json
 
 ```js
 import { run } from 'icu-to-json';
-import { en } from "./precomiled";
 
 // e.g. precompiled icu messsage:
 // "Hello {name}!"
-run(precompiledMessage, en, { name: 'World' })) // Hello, World!
+run(precompiledMessage, "en", { name: 'World' })) // Hello, World!
 ```
 
 #### Plurals and Selectordinal
 
 ```js
 import { run } from 'icu-to-json';
-import { en } from "./precomiled";
 
 // e.g. precompiled icu messsage:
 // "You have {count, plural, one {# unread message} other {# unread messages}}."
-run(precompiledMessage, en, { count: 1 })) // You have 1 unread message.
+run(precompiledMessage, "en", { count: 1 })) // You have 1 unread message.
 ```
 
 #### Tags
@@ -70,11 +68,10 @@ Tags can be used to wrap parts of the message.
 
 ```js
 import { run } from 'icu-to-json';
-import { en } from "./precomiled";
 
 // e.g. precompiled icu messsage:
 // "You have <b>{count}</b> messages."
-run(precompiledMessage, en, { count: 2, b: (content: number) => `**${number}**`})) // You have **2** messages.
+run(precompiledMessage, "en", { count: 2, b: (content: number) => `**${number}**`})) // You have **2** messages.
 ```
 
 #### Rich Text
@@ -85,17 +82,13 @@ JSX is only used as an example here - it works with any other object as well.
 ```jsx
 import { evaluateAst } from 'icu-to-json';
 
-import { en } from "@messageformat/runtime/lib/cardinals";
-import { en as enOd } from "make-plural/ordinals";
-
-const localeEn = ['en', en, enOd];
 // e.g. precompiled icu messsage:
 // "You have <link><b>{count, plural, one {# unread message} other {# unread messages}}.</b></link>"
-evaluateAst(precompiledMessage, localeEn, { 
+evaluateAst(precompiledMessage, "en", { 
     count: 1, 
     link: (content: string) => <a href="/messages">{content}</a>,
     b: (content: string) => <b>{content}</b>
-})) // [ 'You have ', <a href="/messages"><b>1 unread message.</b></a> ]
+}) // [ 'You have ', <a href="/messages"><b>1 unread message.</b></a> ]
 ```
 
 ### Compile

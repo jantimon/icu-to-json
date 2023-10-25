@@ -1,6 +1,4 @@
 import { number, select } from "./messageformat/runtime.js";
-
-import { type PluralCategory } from "@messageformat/runtime/lib/cardinals";
 import { type CompiledAst, type CompiledAstContents, JSON_AST_TYPE_FN, JSON_AST_TYPE_PLURAL, JSON_AST_TYPE_SELECT, JSON_AST_TYPE_SELECTORDINAL, JSON_AST_TYPE_TAG } from "./constants.js";
 export type { CompiledAst } from "./constants.js";
 
@@ -54,7 +52,6 @@ export const run = <T, U>(
   ...args: Parameters<typeof evaluateAst<T, U>>
 ) => evaluateAst(...args).join("");
 
-type LcFunc = (n: number | string) => PluralCategory;
 type ValueOf<T> = T[keyof T];
 
 const reduceStrings = <T extends Array<any>>(arr: T): T => arr.reduce((acc, item) => {
@@ -104,7 +101,8 @@ const getContentValues = <T, U>(
   switch (kind) {
     case JSON_AST_TYPE_PLURAL:
     case JSON_AST_TYPE_SELECTORDINAL:
-      return resolveChildContent(pluralRules(locale, data, value as number, kind) as ValueOf<
+      const key = new Intl.PluralRules(locale, pluralRuleOptions[kind]).select(value as number);
+      return resolveChildContent((key in data ? data[key] : data.other) as ValueOf<
         typeof data
       >)
     case JSON_AST_TYPE_SELECT:
@@ -124,7 +122,7 @@ const getContentValues = <T, U>(
         }
       }
       const childPreprocessor = (formatters.children || ((children) => children)) as (children: Array<string | T>, locale: string) => Array<any>;
-      return fn(...childPreprocessor(resolveChildContent(contents.slice(2)), locale[0]));
+      return fn(...childPreprocessor(resolveChildContent(contents.slice(2)), locale));
     }
   }
 };
@@ -133,8 +131,3 @@ const pluralRuleOptions = {
   // skip JSON_AST_TYPE_PLURAL as it is the default
   3: { type: "ordinal" } 
 } as { [key in typeof JSON_AST_TYPE_SELECTORDINAL | typeof JSON_AST_TYPE_PLURAL]: { type: "ordinal" | "cardinal" } };
-
-const pluralRules = (locales: string, data: Record<string, any>, n: number, kind: typeof JSON_AST_TYPE_PLURAL | typeof JSON_AST_TYPE_SELECTORDINAL) => {
-  const key = new Intl.PluralRules(locales, pluralRuleOptions[kind]).select(n);
-  return key in data ? data[key] : data.other;
-};
