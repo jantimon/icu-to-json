@@ -1,4 +1,4 @@
-import { number, plural, select } from "./messageformat/runtime.js";
+import { number, select } from "./messageformat/runtime.js";
 
 import { type PluralCategory } from "@messageformat/runtime/lib/cardinals";
 import { type CompiledAst, type CompiledAstContents, JSON_AST_TYPE_FN, JSON_AST_TYPE_PLURAL, JSON_AST_TYPE_SELECT, JSON_AST_TYPE_SELECTORDINAL, JSON_AST_TYPE_TAG } from "./constants.js";
@@ -11,14 +11,14 @@ export type { CompiledAst } from "./constants.js";
  * This allows using the runtime with React, Vue, Svelte, etc.
  * 
  * @param packedAst - The precompiled compiled ICU message JSON.
- * @param locale - The current locale, cardinal, ordinal.
+ * @param locale - A locale e.g. "en" or "en-GB".
  * @param args - The arguments to be used in the message.
  * @param formatters - The formatters to be used in the message.
  * @returns The evaluated string or an array of strings and values.
  */
 export const evaluateAst = <T, U>(
   packedAst: CompiledAst,
-  locale: Locale,
+  locale: string,
   args: Record<string, T>,
   formatters?: Record<string, (...args: any[]) => U>
 ) => {
@@ -43,7 +43,11 @@ export const evaluateAst = <T, U>(
 /**
  * Given a precompiled compiled ICU message JSON, return the evaluated string.
  * 
+ * @param packedAst - The precompiled compiled ICU message JSON.
+ * @param locale - A locale e.g. "en" or "en-GB".
  * @param args - The arguments to be used in the message.
+ * @param formatters - The formatters to be used in the message.
+ * 
  * @returns The evaluated string.
  */
 export const run = <T, U>(
@@ -52,8 +56,6 @@ export const run = <T, U>(
 
 type LcFunc = (n: number | string) => PluralCategory;
 type ValueOf<T> = T[keyof T];
-/** [The current locale, cardinal, ordinal] e.g: `["en-US", require("@messageformat/runtime/lib/cardinals").en, require("make-plural/ordinals").en ]` */
-export type Locale = readonly [string, LcFunc, LcFunc];
 
 const reduceStrings = <T extends Array<any>>(arr: T): T => arr.reduce((acc, item) => {
   if ([typeof item, typeof acc[acc.length - 1]].some((t) => t !== "string" && t !== "number")) {
@@ -75,7 +77,7 @@ const getContentValues = <T, U>(
   contents: CompiledAstContents,
   keys: { [keyIndex: number]: string },
   values: Record<string, T>,
-  locale: Locale,
+  locale: string,
   ordinalValue: number,
   formatters: Record<string, (...args: any[]) => U>
 ): Array<T | string> => {
@@ -83,7 +85,7 @@ const getContentValues = <T, U>(
     return [contents];
   }
   if (contents === -1) {
-    return [number(locale[0], ordinalValue, 0)];
+    return [number(locale, ordinalValue, 0)];
   }
 
   if (typeof contents === "number") {
@@ -100,27 +102,17 @@ const getContentValues = <T, U>(
     .flat());
 
   switch (kind) {
-    case JSON_AST_TYPE_PLURAL: {
-      return resolveChildContent(plural(value as number, 0, locale[1], data) as ValueOf<
+    case JSON_AST_TYPE_PLURAL:
+    case JSON_AST_TYPE_SELECTORDINAL:
+      return resolveChildContent(pluralRules(locale, data, value as number, kind) as ValueOf<
         typeof data
       >)
-    }
-    case JSON_AST_TYPE_SELECTORDINAL: {
-      return resolveChildContent(plural(
-        value as number,
-        0,
-        locale[2],
-        data,
-        true
-      ) as ValueOf<typeof data>)
-    }
     case JSON_AST_TYPE_SELECT:
       return resolveChildContent(select(String(value), data) as ValueOf<typeof data>);
-    case JSON_AST_TYPE_FN: {
+    case JSON_AST_TYPE_FN:
       return resolveChildContent([
-        formatters[data](value, locale[0], contents[3]) as CompiledAstContents,
+        formatters[data](value, locale, contents[3]) as CompiledAstContents,
       ]);
-    }
     case JSON_AST_TYPE_TAG: {
       const tag = keys[attr];
       const fn = (values[tag] as (...args: any) => any) || ((children) => [`<${tag}>`, children, `</${tag}>`]);
@@ -135,4 +127,14 @@ const getContentValues = <T, U>(
       return fn(...childPreprocessor(resolveChildContent(contents.slice(2)), locale[0]));
     }
   }
+};
+
+const pluralRuleOptions = { 
+  // skip JSON_AST_TYPE_PLURAL as it is the default
+  3: { type: "ordinal" } 
+} as { [key in typeof JSON_AST_TYPE_SELECTORDINAL | typeof JSON_AST_TYPE_PLURAL]: { type: "ordinal" | "cardinal" } };
+
+const pluralRules = (locales: string, data: Record<string, any>, n: number, kind: typeof JSON_AST_TYPE_PLURAL | typeof JSON_AST_TYPE_SELECTORDINAL) => {
+  const key = new Intl.PluralRules(locales, pluralRuleOptions[kind]).select(n);
+  return key in data ? data[key] : data.other;
 };

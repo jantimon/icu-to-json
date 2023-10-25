@@ -1,6 +1,6 @@
 {
   "name": "icu-to-json",
-  "version": "0.0.10",
+  "version": "0.0.12",
   "description": "Compile ICU MessageFormat strings to JSON at build time and render them at runtime",
   "main": "dist/runtime.js",
   "types": "dist/runtime.d.ts",
@@ -38,8 +38,7 @@
   "license": "MIT",
   "dependencies": {
     "@formatjs/icu-messageformat-parser": "2.7.0",
-    "@messageformat/runtime": "3.0.1",
-    "make-plural": "7.3.0"
+    "@messageformat/runtime": "3.0.1"
   },
   "devDependencies": {
     "@types/yargs-parser": "^21.0.2",

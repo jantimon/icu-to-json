@@ -99,11 +99,10 @@ function generateDictionaryApi(source: unknown, options: Options = {}): string {
 
   const usedLanguages = Object.keys(dictionary);
   const languageWithRegions = (options.languages || usedLanguages || availableLanguages).sort();
-  const languages = [...new Set(languageWithRegions.map((lang) => lang.split("-")[0]))];
   const withFormatters = options.formatters !== false;
 
-  const imports = [`import type { Locale } from "icu-to-json";`];
-  const code = [];
+  const imports: string[] = [];
+  const code: string[] = [];
 
   if (withFormatters) {
     const messageFormatFormatters: Record<string, string> = {};
@@ -149,69 +148,22 @@ function generateDictionaryApi(source: unknown, options: Options = {}): string {
   // Language type
   code.push(`export type Language = ${languageWithRegions.map((lang) => JSON.stringify(lang)).join(" | ")};`);
 
-  const pluralImports = languages.map(
-    (language) => language + " as " + language + "Plural"
-  );
-  const ordinalImports = languages.map(
-    (language) => language + " as " + language + "Ordinal"
-  );
-
-  if (usages.has("plural")) {
-    imports.push(
-      `import { ${pluralImports.join(", ")} } from "make-plural/plurals";`
-    );
-  }
-  if (usages.has("selectordinal")) {
-    imports.push(
-      `import { ${ordinalImports.join(
-        ", "
-      )} } from "@messageformat/runtime/lib/cardinals";`
-    );
-  }
-
-  code.push(...languages.map((language) => {
-    const lang = JSON.stringify(language);
-    const plural = usages.has("plural") ? language + "Plural" : (usages.has("selectordinal") ? "null" : undefined);
-    const ordinal = usages.has("selectordinal")
-      ? language + "Ordinal"
-      : undefined;
-    const localeParts = [lang, plural, ordinal].filter(Boolean);
-
-    return `export const ${language}: Locale = [${localeParts.join(", ")}]${localeParts.length !== 3 ? " as any" : ""};`;
-  }));
-
-
-  // const locales = { en, de, ... };
-  code.push(`const locales = {${languages.map((language) => {
-    const plural = usages.has("plural") ? language + "Plural" : (usages.has("selectordinal") ? "null" : undefined);
-    const ordinal = usages.has("selectordinal")
-      ? language + "Ordinal"
-      : undefined;
-    const localeParts = [plural, ordinal].filter(Boolean);
-    return `${language}: [${localeParts.join(", ")}]${localeParts.length !== 2 ? " as any" : ""}`;
-  }).join(", ")}} as const;`);
-
-
   // t function
   code.push("\n");
   imports.push(`import { type CompiledAst, evaluateAst, run } from "icu-to-json";`);
-  code.push(`const getLocale = (lang: Language) => [lang, ...locales[lang.split("-")[0] as keyof typeof locales]] as Locale;`);
   code.push(`/**
   * This function is used to create a translation function that returns a string
   */`,
-    `export const createTranslationFn = (messages: Record<string, unknown>, lang: Language) => {
-  const locale = getLocale(lang);
-  return <TKey extends keyof MessageArguments>(key: TKey, args: MessageArguments[TKey]): string => run(messages[key] as CompiledAst, locale, args as Record<string, string | number | Date>, formatters);
-};`
+    `export const createTranslationFn = (messages: Record<string, unknown>, lang: Language) => 
+  <TKey extends keyof MessageArguments>(key: TKey, args: MessageArguments[TKey]): string => run(messages[key] as CompiledAst, lang, args as Record<string, string | number | Date>, formatters);`
   );
   code.push(
     `/**
   * This function is used to create a translation function that returns a rich AST
   */`,
     `export const createTranslationRitchFn = (messages: Record<string, unknown>, lang: Language, childPreprocessor?: (children: unknown) => any) => {
-  const locale = getLocale(lang);
   const richFormatters = {...formatters, children: childPreprocessor}${/* TODO - fix formatter typings */" as any"};
-  return <TKey extends keyof MessageArguments>(key: TKey, args: MessageArguments[TKey]) => evaluateAst(messages[key] as CompiledAst, locale, args as Record<string, string | number | Date>, richFormatters);
+  return <TKey extends keyof MessageArguments>(key: TKey, args: MessageArguments[TKey]) => evaluateAst(messages[key] as CompiledAst, lang, args as Record<string, string | number | Date>, richFormatters);
 };`
   );
 

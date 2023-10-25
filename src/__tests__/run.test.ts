@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import { compileToJson } from "../compiler.js";
 import { evaluateAst } from "../runtime.js";
-import { createTranslationFn, en } from "./__snapshots__/cli.test.messages.js";
+import { createTranslationFn } from "./__snapshots__/cli.test.messages.js";
 import messages from "./__snapshots__/cli.test.messages.json";
 
 // example t implementation:
@@ -32,9 +32,9 @@ test("select", () => {
   );
 });
 
-test("selectordinal", () => {
+test.only("selectordinal", () => {
   expect(t("selectordinal", { place: 3 })).toMatchInlineSnapshot(
-    '"You finished 3th!"'
+    '"You finished 3rd!"'
   );
 });
 
@@ -95,7 +95,7 @@ test("evaluateAst with non string argument", () => {
   expect(
     evaluateAst(
       json,
-      en,
+      "en",
       {
         name: ["World"],
       },
