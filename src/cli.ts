@@ -1,8 +1,8 @@
 import { mkdir, readFile, writeFile } from "fs/promises";
 import { dirname } from "path";
 import { ArgumentUsage, compile, compileToJson } from "./compiler.js";
-import { availableLanguages } from "./messageformat/languages.js";
 import yargs from "yargs-parser";
+import { availableLanguages } from "./constants.js";
 
 type Options = Partial<{
   languages: string[];
