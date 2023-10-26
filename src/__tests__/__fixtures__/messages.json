@@ -27,6 +27,13 @@
         "it": "Ciao, Il tuo amico {friend} è ora online. {gender, select, female {Lei} male {Lui} other {Loro}} hanno aggiunto una nuova immagine al sistema.",
         "de-DE": "Hallo, Dein Freund {friend} ist jetzt online. {gender, select, female {Sie} male {Er} other {Sie}} hat ein neues Bild zum System hinzugefügt."
     },
+    "selectNumeric": {
+        "en": "She has {children, plural, =0 {no children} =1 {1 child} other {# children}} and lives in {city}.",
+        "es": "Ella tiene {children, plural, =0 {no tiene hijos} =1 {1 hijo} other {# hijos}} y vive en {city}.",
+        "fr": "Elle a {children, plural, =0 {pas d'enfants} =1 {1 enfant} other {# enfants}} et vit à {city}.",
+        "it": "Lei ha {children, plural, =0 {nessun figlio} =1 {1 figlio} other {# figli}} e vive a {city}.",
+        "de-DE": "Sie hat {children, plural, =0 {keine Kinder} =1 {1 Kind} other {# Kinder}} und lebt in {city}."
+    },
     "selectordinal": {
         "en": "You finished {place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}!",
         "es": "¡Terminaste en el {place, selectordinal, one {#er} two {#do} few {#ro} other {#to}} lugar!",
@@ -82,5 +89,12 @@
         "fr": "La valeur entière de {amount} est {amount, number, integer}",
         "it": "Il valore intero di {amount} è {amount, number, integer}",
         "de-DE": "Der Ganzzahlwert von {amount} ist {amount, number, integer}"
+    },
+    "interpolatedStrings": {
+        "en": "Hello, my name is [0] and I am [1] years old.",
+        "es": "Hola, mi nombre es [0] y tengo [1] años.",
+        "fr": "Bonjour, je m'appelle [0] et j'ai [1] ans.",
+        "it": "Ciao, mi chiamo [0] e ho [1] anni.",
+        "de-DE": "Hallo, mein Name ist [0] und ich bin [1] Jahre alt."
     }
 }

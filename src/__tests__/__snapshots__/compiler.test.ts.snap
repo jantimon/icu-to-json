@@ -53,6 +53,28 @@ exports[`measure size for integer example 1`] = `
 ]
 `;
 
+exports[`measure size for interpolatedStrings example 1`] = `
+[
+  "Hello, my name is [0] and I am [1] years old.",
+  [
+    [
+      0,
+      1,
+    ],
+    "Hello, my name is ",
+    0,
+    " and I am ",
+    1,
+    " years old.",
+  ],
+  "
+   size (icu message): 47b
+   size (json):        59b
+   overhead:           +26%
+",
+]
+`;
+
 exports[`measure size for money example 1`] = `
 [
   "Buy now to save {amount, number, currency:GBP}",
@@ -185,6 +207,43 @@ exports[`measure size for select example 1`] = `
    size (icu message): 131b
    size (json):        156b
    overhead:           +19%
+",
+]
+`;
+
+exports[`measure size for selectNumeric example 1`] = `
+[
+  "She has {children, plural, =0 {no children} =1 {1 child} other {# children}} and lives in {city}.",
+  [
+    [
+      "children",
+      "city",
+    ],
+    "She has ",
+    [
+      2,
+      0,
+      {
+        "0": [
+          "no children",
+        ],
+        "1": [
+          "1 child",
+        ],
+        "other": [
+          -1,
+          " children",
+        ],
+      },
+    ],
+    " and lives in ",
+    1,
+    ".",
+  ],
+  "
+   size (icu message): 99b
+   size (json):        124b
+   overhead:           +25%
 ",
 ]
 `;

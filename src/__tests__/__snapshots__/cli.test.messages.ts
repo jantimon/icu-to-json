@@ -8,6 +8,10 @@ export type MessageArguments<TArgumentType = number | string, TArgumentTagType =
   "integer": {
     "amount": number;
   },
+  "interpolatedStrings": {
+    "0": TArgumentType;
+    "1": TArgumentType;
+  },
   "money": {
     "amount": number;
   },
@@ -23,6 +27,10 @@ export type MessageArguments<TArgumentType = number | string, TArgumentTagType =
   "select": {
     "friend": TArgumentType;
     "gender": number | string;
+  },
+  "selectNumeric": {
+    "children": number;
+    "city": TArgumentType;
   },
   "selectordinal": {
     "place": number;

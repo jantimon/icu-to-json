@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { compileToJson } from "../compiler.js";
-import { evaluateAst } from "../runtime.js";
+import { evaluateAst, run } from "../runtime.js";
 import { createTranslationFn } from "./__snapshots__/cli.test.messages.js";
 import messages from "./__snapshots__/cli.test.messages.json";
 
@@ -32,9 +32,23 @@ test("select", () => {
   );
 });
 
-test.only("selectordinal", () => {
+test("selectNumeric", () => {
+  expect(
+    t("selectNumeric", { children: 1, city: "Berlin" })
+  ).toMatchInlineSnapshot(
+    '"She has 1 child and lives in Berlin."'
+  );
+});
+
+test("selectordinal", () => {
   expect(t("selectordinal", { place: 3 })).toMatchInlineSnapshot(
     '"You finished 3rd!"'
+  );
+});
+
+test("selectordinal", () => {
+  expect(t("interpolatedStrings", ["Joe", 12 ])).toMatchInlineSnapshot(
+    '"Hello, my name is Joe and I am 12 years old."'
   );
 });
 
@@ -102,4 +116,19 @@ test("evaluateAst with non string argument", () => {
       {}
     )
   ).toEqual(["Hello ", ["World"], "!"]);
+});
+
+test("interpolated", () => {
+  const json = compileToJson(`Hello [0] [1] [0]!`, { allowStringInterpolation: true });
+  expect(
+    run(
+      json,
+      "en",
+      {
+        0: "Joe",
+        1: "Doe"
+      },
+      {}
+    )
+  ).toMatchInlineSnapshot('"Hello Joe Doe Joe!"')
 });

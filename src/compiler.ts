@@ -1,5 +1,8 @@
 import { parse, TYPE } from "@formatjs/icu-messageformat-parser";
-import type { MessageFormatElement, NumberSkeleton } from "@formatjs/icu-messageformat-parser";
+import type {
+  MessageFormatElement,
+  NumberSkeleton,
+} from "@formatjs/icu-messageformat-parser";
 import {
   CompiledArgList,
   CompiledAst,
@@ -16,9 +19,17 @@ import {
 
 type Ast = ReturnType<typeof parse>;
 
-export const compileToJson = (str: string): CompiledAst => compile(str).json;
+interface CompileOptions {
+  /** Allow string interpolations like "Hello [0]!" format */
+  allowStringInterpolation?: boolean;
+}
 
-export const compile = (str: string) => {
+export const compileToJson = (
+  str: string,
+  options?: CompileOptions
+): CompiledAst => compile(str, options).json;
+
+export const compile = (str: string, options?: CompileOptions) => {
   const ast = parse(str);
   const args = getAllArguments(ast);
   const argList: CompiledArgList = Object.keys(args);
@@ -27,6 +38,10 @@ export const compile = (str: string) => {
   // pure text is returned as a string to save the surrounding array brackets
   const json: CompiledAst =
     result.length === 2 && typeof result[1] === "string" ? result[1] : result;
+  // String interpolation is not supported by format.js
+  if (typeof json === "string" && options?.allowStringInterpolation) {
+    return compileStringInterpolation(json);
+  }
   return {
     args,
     json,
@@ -54,7 +69,12 @@ const compileAst = (ast: Ast, args: string[]): CompiledAstContents[] => {
           args.indexOf(node.value),
           Object.fromEntries(
             Object.entries(node.options).map(([caseName, pluralCase]) => {
-              return [caseName, compileAst(pluralCase.value, args)];
+              // add support for
+              // {{count, plural, one {#} =12{a bunch} other {#s}}}
+              return [
+                caseName.replace(/^\s*=/, ""),
+                compileAst(pluralCase.value, args),
+              ];
             })
           ),
         ] satisfies CompiledPlural;
@@ -82,17 +102,18 @@ const compileAst = (ast: Ast, args: string[]): CompiledAstContents[] => {
           ...(node.style !== null ? [node.style] : []),
         ] satisfies CompiledFn;
       case TYPE.number:
-
-        return (node.style === null) ? [
-          JSON_AST_TYPE_FN,
-          args.indexOf(node.value),
-          "number",
-        ] satisfies CompiledFn : [
-          JSON_AST_TYPE_FN,
-          args.indexOf(node.value),
-          "numberFmt",
-          getNumberFormat(node.style),
-        ] satisfies CompiledFn;
+        return node.style === null
+          ? ([
+              JSON_AST_TYPE_FN,
+              args.indexOf(node.value),
+              "number",
+            ] satisfies CompiledFn)
+          : ([
+              JSON_AST_TYPE_FN,
+              args.indexOf(node.value),
+              "numberFmt",
+              getNumberFormat(node.style),
+            ] satisfies CompiledFn);
       default:
         console.log(node);
         throw new Error("Not implemented");
@@ -136,7 +157,10 @@ const getAllArguments = (ast: Ast) => {
         node.children.forEach(getArgs);
         break;
       case TYPE.plural:
-        args[node.value] = addIfNotExists(args[node.value], node.pluralType === "cardinal" ? "plural" : "selectordinal");
+        args[node.value] = addIfNotExists(
+          args[node.value],
+          node.pluralType === "cardinal" ? "plural" : "selectordinal"
+        );
         Object.entries(node.options).forEach(([, pluralCase]) => {
           pluralCase.value.forEach(getArgs);
         });
@@ -158,9 +182,34 @@ const getAllArguments = (ast: Ast) => {
   return args;
 };
 
+/**
+ * Compile string interpolations like "Hello [0]!" format
+ * to a json ast.
+ */
+const compileStringInterpolation = (
+  str: string
+): { args: Record<string, ArgumentUsage[]>; json: CompiledAst } => {
+  const translationParts = str
+    .split(/\[(\d+)\]/g);
+  if (translationParts.length === 1) {
+    return {
+      args: {},
+      json: str,
+    };
+  }
+  const argList = [...new Set(translationParts.filter((_, index) => index % 2 === 1))];
+  const contents = translationParts.map((translationPart, index) => {
+    return index % 2 === 0 ? translationPart : argList.indexOf(translationPart);
+  }) satisfies CompiledAstContents[];
+  return {
+    args: Object.fromEntries(argList.map((arg) => [arg, ["argument"]])),
+    json: [argList.map(Number) as any[], ...contents] satisfies CompiledAst,
+  };
+};
+
 function getNumberFormat(style: string | NumberSkeleton | undefined) {
   if (style === "%") {
-    return "percent"
+    return "percent";
   }
   return style;
 }

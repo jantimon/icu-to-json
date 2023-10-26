@@ -4,19 +4,35 @@ import { cli } from "../cli.js";
 
 let origArgv: string[];
 beforeAll(() => {
-    origArgv = process.argv;
+  origArgv = process.argv;
 });
 beforeEach(() => {
-    origArgv = process.argv;
+  origArgv = process.argv;
 });
 afterEach(() => {
-    process.argv = origArgv;
+  process.argv = origArgv;
 });
 
-test("cli compile", async() => {
-    await cli(resolve(__dirname, "__fixtures__/messages.json"), resolve(__dirname, "__snapshots__/cli.test.messages.json"), false, true);
+test("cli compile", async () => {
+  await cli(
+    resolve(__dirname, "__fixtures__/messages.json"),
+    resolve(__dirname, "__snapshots__/cli.test.messages.json"),
+    false,
+    true,
+    {
+      formats: ["icu", "interpolated"],
+    }
+  );
 });
 
-test("cli --types", async() => {
-    await cli(resolve(__dirname, "__fixtures__/messages.json"), resolve(__dirname, "__snapshots__/cli.test.messages.ts"), true);
+test("cli --types", async () => {
+  await cli(
+    resolve(__dirname, "__fixtures__/messages.json"),
+    resolve(__dirname, "__snapshots__/cli.test.messages.ts"),
+    true,
+    true,
+    {
+      formats: ["icu", "interpolated"],
+    }
+  );
 });

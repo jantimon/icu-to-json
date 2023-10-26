@@ -1,4 +1,4 @@
-import { number, select } from "./messageformat/runtime.js";
+import { number } from "./messageformat/runtime.js";
 import { type CompiledAst, type CompiledAstContents, JSON_AST_TYPE_FN, JSON_AST_TYPE_PLURAL, JSON_AST_TYPE_SELECT, JSON_AST_TYPE_SELECTORDINAL, JSON_AST_TYPE_TAG } from "./constants.js";
 export type { CompiledAst } from "./constants.js";
 
@@ -97,16 +97,24 @@ const getContentValues = <T, U>(
       getContentValues(content, keys, values, locale, ordinalValue, formatters)
     )
     .flat());
-
   switch (kind) {
     case JSON_AST_TYPE_PLURAL:
     case JSON_AST_TYPE_SELECTORDINAL:
+    case JSON_AST_TYPE_SELECT:
+      // a direct match e.g. {{children, plural, =0 {no children} =1 {1 child} other {# children}}
+      if ({}.hasOwnProperty.call(data, value as string)) {
+        return resolveChildContent(data[value as string] as ValueOf<typeof data>);
+      } else if (kind === JSON_AST_TYPE_SELECT) {
+        // select always falls back to "other" if the direct match is not found
+        return resolveChildContent(data.other as ValueOf<typeof data>);
+      }
+      // plural/selectordinal need to find the correct plural rule if no direct match is found
+      // only if that fails, fall back to "other"
+      // e.g.: {{count, plural, one {1 image} =99 {Many Many} other {# images}}}
       const key = new Intl.PluralRules(locale, pluralRuleOptions[kind]).select(value as number);
       return resolveChildContent((key in data ? data[key] : data.other) as ValueOf<
         typeof data
       >)
-    case JSON_AST_TYPE_SELECT:
-      return resolveChildContent(select(String(value), data) as ValueOf<typeof data>);
     case JSON_AST_TYPE_FN:
       return resolveChildContent([
         formatters[data](value, locale, contents[3]) as CompiledAstContents,
