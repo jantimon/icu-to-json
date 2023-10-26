@@ -103,14 +103,12 @@ const getContentValues = <T, U>(
   if (contents === -1) {
     return [number( ordinalValue, locale)];
   }
-
   if (typeof contents === "number") {
     const key = keys[contents];
     return [values[key]];
   }
   const [kind, attr, data] = contents;
   const value = values[keys[attr]];
-  ordinalValue = value as number;
   const resolveChildContent = (content: CompiledAstContents[]) =>
     reduceStrings(
       content
@@ -120,7 +118,7 @@ const getContentValues = <T, U>(
             keys,
             values,
             locale,
-            ordinalValue,
+            value as number,
             formatters
           )
         )
@@ -149,35 +147,44 @@ const getContentValues = <T, U>(
         (key in data ? data[key] : data.other) as ValueOf<typeof data>
       );
     case JSON_AST_TYPE_FN:
+      // Functions are used for date, time and number formatting
       return resolveChildContent([
         formatters[data](value, locale, contents[3]) as CompiledAstContents,
       ]);
     case JSON_AST_TYPE_TAG: {
+      /** The tag name e.g. "strong" for "<strong>Demo</strong>" */
       const tag = keys[attr];
-      const fn =
+      const tagRenderer =
         (values[tag] as (...args: any) => any) ||
         ((children) => [`<${tag}>`, children, `</${tag}>`]);
       if (process.env.NODE_ENV !== "production") {
-        if (typeof fn !== "function") {
+        if (typeof tagRenderer !== "function") {
           throw new Error(
-            `Expected a function for tag "${keys[attr]}", got ${typeof fn}`
+            `Expected a function for tag "${keys[attr]}", got ${typeof tagRenderer}`
           );
         }
       }
-      const childPreprocessor = (formatters.children ||
-        ((children) => children)) as (
-        children: Array<string | T>,
-        locale: string
-      ) => Array<any>;
-      return fn(
-        ...childPreprocessor(resolveChildContent(contents.slice(2)), locale)
+      return tagRenderer(
+        ...(
+          // Allow preprocessing the children of any tag
+          // this allows wrapping them with a React Fragment 
+          // or to merge them into a single DOM node
+          (formatters.tag ||
+            ((children) => children)) as (
+            children: Array<string | T>,
+            locale: string
+          ) => Array<any>
+        )(
+          // Process the children of the tag before the tag itself
+          // e.g. a plural or text interpolation inside a tag
+          resolveChildContent(contents.slice(2)), locale)
       );
     }
   }
 };
 
 const pluralRuleOptions = {
-  // skip JSON_AST_TYPE_PLURAL as it is the default
+  // skip JSON_AST_TYPE_PLURAL as "cardinal" is the default type
   3: { type: "ordinal" },
 } as {
   [key in typeof JSON_AST_TYPE_SELECTORDINAL | typeof JSON_AST_TYPE_PLURAL]: {
@@ -187,6 +194,7 @@ const pluralRuleOptions = {
 
 /**
  * Utility function for `#` in plural rules
+ * Copied from @messageformat/runtime
  *
  * @param locale The current locale
  * @param value The value to operate on

@@ -66,6 +66,12 @@ test("tags", () => {
   ).toMatchInlineSnapshot('"Wow formatJs allows **⭐️ tags**"');
 });
 
+test("tags without values", () => {
+  expect(
+    t("tags", { } as any)
+  ).toMatchInlineSnapshot('"Wow formatJs allows <b></b>"');
+});
+
 test("number", () => {
   expect(t("number", { numCats: 99 })).toMatchInlineSnapshot(
     '"I have 99 cats."'

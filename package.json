@@ -1,6 +1,6 @@
 {
   "name": "icu-to-json",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "Compile ICU MessageFormat strings to JSON at build time and render them at runtime",
   "main": "dist/runtime.js",
   "types": "dist/runtime.d.ts",
