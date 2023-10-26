@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { mkdir, readFile, writeFile } from "fs/promises";
 import { dirname } from "path";
 import { ArgumentUsage, compile, compileToJson } from "./compiler.js";
