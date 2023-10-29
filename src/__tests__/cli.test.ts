@@ -17,22 +17,12 @@ test("cli compile", async () => {
   await cli(
     resolve(__dirname, "__fixtures__/messages.json"),
     resolve(__dirname, "__snapshots__/cli.test.messages.json"),
-    false,
     true,
+    true,
+    false,
     {
       formats: ["icu", "interpolated"],
     }
   );
 });
 
-test("cli --types", async () => {
-  await cli(
-    resolve(__dirname, "__fixtures__/messages.json"),
-    resolve(__dirname, "__snapshots__/cli.test.messages.ts"),
-    true,
-    true,
-    {
-      formats: ["icu", "interpolated"],
-    }
-  );
-});

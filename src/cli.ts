@@ -17,11 +17,15 @@ export async function cli(
   output: string,
   types: boolean,
   normalizeJson?: boolean,
+  split?: boolean,
   options: Options = {}
 ) {
-  if (!input || !output) {
+  if (!input) {
     console.error("Usage: icu-to-json input.js output.json");
     process.exit(1);
+  }
+  if (!output) {
+    output = input.replace(/\.json$/, "") + ".icu.json";
   }
   if (input === output) {
     console.error("Input and output cannot be the same file");
@@ -29,44 +33,65 @@ export async function cli(
   }
   const source = await readFile(input, "utf8");
   const json = JSON.parse(source);
-  const result = types
-    ? generateDictionaryApi(json, options)
-    : JSON.stringify(
-        replaceStringsInFile(normalizeJson ? normalize(json) : json, (string) =>
-          compileToJson(string, {
-            allowStringInterpolation: options.formats?.includes("interpolated"),
-          })
-        )
-      );
+  const result = replaceStringsInFile((split || normalizeJson) ? normalize(json) : json, (string) =>
+    compileToJson(string, {
+      allowStringInterpolation: options.formats?.includes("interpolated"),
+    })
+  );
 
   await mkdir(dirname(output), { recursive: true });
-  await writeFile(output, result);
-  console.log(`Wrote ${output}`);
+  if (!split) {
+    await writeFile(output, JSON.stringify(result));
+    console.log(`Wrote ${output}`);
+  } else {
+    // Split into multiple files
+    const languages = Object.keys(result);
+    await Promise.all(
+      languages.map(async (lang) => {
+        const languageJsonFile = output.replace(/\.json$/, "") + `.${lang}.json`;
+        await writeFile(languageJsonFile, JSON.stringify(result[lang]))
+        console.log(`Wrote ${languageJsonFile}`);
+      })
+    );
+
+  }
+
+  if (types) {
+    const typesOutput = output.replace(/\.json$/, "") + ".ts";
+    await writeFile(typesOutput, generateDictionaryApi(json, options));
+    console.log(`Wrote ${typesOutput}`);
+  }
 }
 
 if (String(process.argv[1]).match(/(icu-to-json|cli)(\.(js|ts|cmd)|)$/)) {
   const argv = yargs(process.argv.slice(2), {
-    boolean: ["types", "formatters", "normalize"],
+    boolean: ["types", "formatters", "normalize", "split"],
     array: ["lang", "formats"],
   });
-  const langArg = (argv.lang as string[])
+  const languagesArg = ((argv.lang as string[]) || [])
     .join(",")
     .split(",")
     .filter(Boolean)
-    .filter((lang) => availableLanguages.includes(lang.split("-")[0]));
-  const languages = langArg.length ? langArg : availableLanguages;
-  const formatsArg = (argv.formats as string[])
+    .filter((lang) =>
+      availableLanguages.includes(lang.split("-")[0])
+    ) as string[];
+  const languages = languagesArg.length ? languagesArg : undefined;
+  const formats = ((argv.formats as string[]) || ["icu"])
     .join(",")
     .split(",")
-    .filter(Boolean);
-  const formats = (formatsArg.length ? formatsArg : ["icu"]) as Array<
-    "icu" | "interpolated"
-  >;
-  cli(argv[0], argv[1], argv.types, argv.normalize, {
-    languages,
-    formatters: argv.formatters,
-    formats,
-  });
+    .filter(Boolean) as Array<"icu" | "interpolated">;
+  cli(
+    argv._[0] as string,
+    argv._[1] as string,
+    argv.types,
+    argv.normalize,
+    argv.split,
+    {
+      languages,
+      formatters: argv.formatters,
+      formats,
+    }
+  );
 }
 
 /**
@@ -122,7 +147,7 @@ function generateDictionaryApi(source: unknown, options: Options = {}): string {
       Object.entries(compiled.args).forEach(([arg, argType]) => {
         typeMapForTranslationArgs[arg] =
           typeMapping[
-            argType.filter((usage) => usage !== "argument")[0] || "argument"
+          argType.filter((usage) => usage !== "argument")[0] || "argument"
           ];
         argType.forEach((usage) => usages.add(usage));
       });
@@ -211,7 +236,7 @@ function generateDictionaryApi(source: unknown, options: Options = {}): string {
     `export const createTranslationRitchFn = (messages: Record<string, unknown>, lang: Language, childPreprocessor?: (children: unknown) => any) => {
   const richFormatters = {...formatters, children: childPreprocessor}${
     /* TODO - fix formatter typings */ " as any"
-  };
+    };
   return <TKey extends keyof MessageArguments>(key: TKey, args: MessageArguments[TKey]) => evaluateAst(messages[key] as CompiledAst, lang, args as Record<string, string | number | Date>, richFormatters);
 };`
   );
