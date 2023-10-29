@@ -15,7 +15,7 @@ The main goal is to boot up javascript apps with ICU translations as fast as pos
 
 Therefore this library provides a way to compile ICU MessageFormat strings to compressed JSON at build time and render them at runtime with a minimal runtime footprint.
 
-![overhead size comparison](https://raw.githubusercontent.com/jantimon/icu-to-json/main/docs/sizes.png)
+[![overhead size comparison](https://raw.githubusercontent.com/jantimon/icu-to-json/main/docs/sizes.png)](https://playground-icu-to-json.vercel.app/comparison)
 
 [![size of icu-to-json](https://raw.githubusercontent.com/jantimon/icu-to-json/main/docs/size.png)](https://pkg-size.dev/icu-to-json)
 
