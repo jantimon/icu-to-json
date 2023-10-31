@@ -6,6 +6,7 @@ import {
   JSON_AST_TYPE_SELECT,
   JSON_AST_TYPE_SELECTORDINAL,
   JSON_AST_TYPE_TAG,
+  CompiledOrdinal,
 } from "./constants.js";
 export type { CompiledAst } from "./constants.js";
 
@@ -22,27 +23,29 @@ export type { CompiledAst } from "./constants.js";
  * @returns The evaluated string or an array of strings and values.
  */
 export const evaluateAst = <T, U>(
-  packedAst: CompiledAst,
+  ast: CompiledAst,
   locale: string,
   args: Record<string, T>,
   formatters?: Record<string, (...args: any[]) => U>
 ) => {
   // pure text can be returned as string:
-  if (typeof packedAst === "string") {
-    return [packedAst];
+  if (typeof ast === "string") {
+    return [ast];
   }
   const withDefaultFormatters = {
     number,
+    baseTag: (tag: string, ...children: Array<string | T>) => ([
+      `<${tag}>`,
+      ...children,
+      `</${tag}>`,
+    ] as U),
     ...formatters,
   };
-  // unpack the AST:
-  const [argNames, ...ast] = packedAst;
   const result = reduceStrings(
     ast
       .map((contents) =>
-        getContentValues(
+        getContentValues<T, U>(
           contents,
-          argNames,
           args,
           locale,
           0,
@@ -67,8 +70,6 @@ export const evaluateAst = <T, U>(
 export const run = <T, U>(...args: Parameters<typeof evaluateAst<T, U>>) =>
   evaluateAst(...args).join("");
 
-type ValueOf<T> = T[keyof T];
-
 const reduceStrings = <T extends Array<any>>(arr: T): T =>
   arr.reduce((acc, item) => {
     if (
@@ -81,7 +82,7 @@ const reduceStrings = <T extends Array<any>>(arr: T): T =>
       acc[acc.length - 1] += String(item);
     }
     return acc;
-  }, [] as any as T);
+  }, [] as unknown[] as T);
 
 /**
  * Recursively evaluate ICU expressions like `plural`, `select`, `selectordinal`, `fn` and `tag`
@@ -91,31 +92,29 @@ const reduceStrings = <T extends Array<any>>(arr: T): T =>
  */
 const getContentValues = <T, U>(
   contents: CompiledAstContents,
-  keys: { [keyIndex: number]: string },
   values: Record<string, T>,
   locale: string,
   ordinalValue: number,
-  formatters: Record<string, (...args: any[]) => U>
+  formatters: Record<string, (...args: any[]) => (U | string)>
 ): Array<T | string> => {
   if (typeof contents === "string") {
     return [contents];
   }
-  if (contents === -1) {
-    return [number( ordinalValue, locale)];
+  if (contents === CompiledOrdinal) {
+    return [number(ordinalValue, locale)];
   }
-  if (typeof contents === "number") {
-    const key = keys[contents];
-    return [values[key]];
+  const [attr, kind, data] = contents;
+  const value = values[attr as keyof typeof values];
+  // The Compiled Attribute Node has no Kind to save space
+  if (!kind) {
+    return [value];
   }
-  const [kind, attr, data] = contents;
-  const value = values[keys[attr]];
-  const resolveChildContent = (content: CompiledAstContents[]) =>
+  const resolveChildContent = (contents: CompiledAstContents[]) =>
     reduceStrings(
-      content
+      contents
         .map((content) =>
           getContentValues(
             content,
-            keys,
             values,
             locale,
             value as number,
@@ -125,17 +124,17 @@ const getContentValues = <T, U>(
         .flat()
     );
   switch (kind) {
+    case JSON_AST_TYPE_SELECT:
     case JSON_AST_TYPE_PLURAL:
     case JSON_AST_TYPE_SELECTORDINAL:
-    case JSON_AST_TYPE_SELECT:
       // a direct match e.g. {{children, plural, =0 {no children} =1 {1 child} other {# children}}
-      if ({}.hasOwnProperty.call(data, value as string)) {
+      if ({}.hasOwnProperty.call(data!, value as string)) {
         return resolveChildContent(
-          data[value as string] as ValueOf<typeof data>
+          (data!)[value as string]
         );
       } else if (kind === JSON_AST_TYPE_SELECT) {
         // select always falls back to "other" if the direct match is not found
-        return resolveChildContent(data.other as ValueOf<typeof data>);
+        return resolveChildContent((data!).other as CompiledAstContents[]);
       }
       // plural/selectordinal need to find the correct plural rule if no direct match is found
       // only if that fails, fall back to "other"
@@ -144,23 +143,23 @@ const getContentValues = <T, U>(
         value as number
       );
       return resolveChildContent(
-        (key in data ? data[key] : data.other) as ValueOf<typeof data>
+        (key in (data!) ? (data!)[key] : (data!).other) as CompiledAstContents[]
       );
     case JSON_AST_TYPE_FN:
       // Functions are used for date, time and number formatting
       return resolveChildContent([
-        formatters[data](value, locale, contents[3]) as CompiledAstContents,
+        formatters[data!](value, locale, contents[3]) as CompiledAstContents,
       ]);
     case JSON_AST_TYPE_TAG: {
       /** The tag name e.g. "strong" for "<strong>Demo</strong>" */
-      const tag = keys[attr];
       const tagRenderer =
-        (values[tag] as (...args: any) => any) ||
-        ((children) => [`<${tag}>`, children, `</${tag}>`]);
+        (values[attr] as (...args: any) => any) ||
+        formatters.baseTag.bind(contents, attr);
+
       if (process.env.NODE_ENV !== "production") {
         if (typeof tagRenderer !== "function") {
           throw new Error(
-            `Expected a function for tag "${keys[attr]}", got ${typeof tagRenderer}`
+            `Expected a function for tag "${attr}", got ${typeof tagRenderer}`
           );
         }
       }
@@ -171,13 +170,13 @@ const getContentValues = <T, U>(
           // or to merge them into a single DOM node
           (formatters.tag ||
             ((children) => children)) as (
-            children: Array<string | T>,
-            locale: string
-          ) => Array<any>
+              children: Array<string | T>,
+              locale: string
+            ) => Array<any>
         )(
           // Process the children of the tag before the tag itself
           // e.g. a plural or text interpolation inside a tag
-          resolveChildContent(contents.slice(2)), locale)
+          resolveChildContent(contents.slice(2) as CompiledAstContents[]), locale)
       );
     }
   }
@@ -187,10 +186,10 @@ const pluralRuleOptions = {
   // skip JSON_AST_TYPE_PLURAL as "cardinal" is the default type
   3: { type: "ordinal" },
 } as {
-  [key in typeof JSON_AST_TYPE_SELECTORDINAL | typeof JSON_AST_TYPE_PLURAL]: {
-    type: "ordinal" | "cardinal";
+    [key in typeof JSON_AST_TYPE_SELECTORDINAL | typeof JSON_AST_TYPE_PLURAL]: {
+      type: "ordinal" | "cardinal";
+    };
   };
-};
 
 /**
  * Utility function for `#` in plural rules

@@ -1,12 +1,13 @@
 import { expect, test } from "vitest";
 import { compileToJson } from "../compiler.js";
 import { evaluateAst, run } from "../runtime.js";
-import { createTranslationFn } from "./__snapshots__/cli.test.messages.js";
+import { createTranslationFn, createTranslationRitchFn } from "./__snapshots__/cli.test.messages.js";
 import messages from "./__snapshots__/cli.test.messages.json";
 
 // example t implementation:
 const t = createTranslationFn(messages.en, "en");
 const tDe = createTranslationFn(messages["de-DE"], "de-DE");
+const tRich = createTranslationRitchFn(messages.en, "en");
 
 test("text", () => {
   expect(t("text", {})).toMatchInlineSnapshot('"Hello"');
@@ -65,11 +66,56 @@ test("tags", () => {
     t("tags", { b: (children) => `**${children}**`, dynamic: "⭐️" })
   ).toMatchInlineSnapshot('"Wow formatJs allows **⭐️ tags**"');
 });
+test("tags with richtext", () => {
+  expect(
+    tRich("tags", { dynamic: {tag: "span", html: "⭐️"} } as any)
+  ).toMatchInlineSnapshot(`
+    [
+      "Wow formatJs allows <b>",
+      {
+        "html": "⭐️",
+        "tag": "span",
+      },
+      " tags</b>",
+    ]
+  `);
+});
+
+test("baseTag", () => {
+  const ast = compileToJson(`This is an <b>important</b> message. You <i>should</i>:<ul><li><b>Read</b> it</li><li><b>Understand</b> it</li><li><b>Share</b> it</li></ul>Thanks.`);
+  expect(
+    evaluateAst(
+      ast,
+      "en",
+      {},
+      {
+        baseTag: (tag: string, ...children: Array<string | string[]>) => {
+          switch (tag) {
+            case "ul":
+              return [...children, "\n"];
+            case "li":
+              return ["\n - ", ...children];
+            case "b":
+              return ["**", ...children, "**"];
+            default:
+              // ignore <i> and other unknown tags
+              return children;
+          }
+        }
+      }
+    ).join("")).toMatchInlineSnapshot(`
+      "This is an **important** message. You should:
+       - **Read** it
+       - **Understand** it
+       - **Share** it
+      Thanks."
+    `);
+});
 
 test("tags without values", () => {
   expect(
     t("tags", { } as any)
-  ).toMatchInlineSnapshot('"Wow formatJs allows <b></b>"');
+  ).toMatchInlineSnapshot('"Wow formatJs allows <b> tags</b>"');
 });
 
 test("number", () => {

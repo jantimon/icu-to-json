@@ -4,10 +4,11 @@ import type {
   NumberSkeleton,
 } from "@formatjs/icu-messageformat-parser";
 import {
-  CompiledArgList,
+  CompiledArgument,
   CompiledAst,
   CompiledAstContents,
   CompiledFn,
+  CompiledOrdinal,
   CompiledPlural,
   CompiledTag,
   JSON_AST_TYPE_FN,
@@ -29,15 +30,17 @@ export const compileToJson = (
   options?: CompileOptions
 ): CompiledAst => compile(str, options).json;
 
+/**
+ * Convert an ICU messageformat string to a json ast which can be render by the icu-to-json runtime.
+ */
 export const compile = (str: string, options?: CompileOptions) => {
   const ast = parse(str);
   const args = getAllArguments(ast);
-  const argList: CompiledArgList = Object.keys(args);
-  const result = [argList, ...compileAst(ast, argList)] satisfies CompiledAst;
+  const result = compileAst(ast) satisfies CompiledAst;
   // to reduce the size of the json payload,
   // pure text is returned as a string to save the surrounding array brackets
   const json: CompiledAst =
-    result.length === 2 && typeof result[1] === "string" ? result[1] : result;
+    result.length === 1 && typeof result[0] === "string" ? result[0] : result;
   // String interpolation is not supported by format.js
   if (typeof json === "string" && options?.allowStringInterpolation) {
     return compileStringInterpolation(json);
@@ -48,16 +51,17 @@ export const compile = (str: string, options?: CompileOptions) => {
   };
 };
 
-const compileAst = (ast: Ast, args: string[]): CompiledAstContents[] => {
+const compileAst = (ast: Ast): CompiledAstContents[] => {
   return ast.map((node): CompiledAstContents => {
     switch (node.type) {
       case TYPE.literal:
         return node.value;
       case TYPE.argument:
-        return args.indexOf(node.value);
+        return [node.value];
       case TYPE.plural:
       case TYPE.select:
         return [
+          node.value,
           node.type === TYPE.select
             ? JSON_AST_TYPE_SELECT
             : // in format.js
@@ -66,51 +70,50 @@ const compileAst = (ast: Ast, args: string[]): CompiledAstContents[] => {
             node.pluralType === "ordinal"
             ? JSON_AST_TYPE_SELECTORDINAL
             : JSON_AST_TYPE_PLURAL,
-          args.indexOf(node.value),
           Object.fromEntries(
             Object.entries(node.options).map(([caseName, pluralCase]) => {
               // add support for
               // {{count, plural, one {#} =12{a bunch} other {#s}}}
               return [
                 caseName.replace(/^\s*=/, ""),
-                compileAst(pluralCase.value, args),
+                compileAst(pluralCase.value),
               ];
             })
           ),
         ] satisfies CompiledPlural;
       case TYPE.tag:
         return [
+          node.value,
           JSON_AST_TYPE_TAG,
-          args.indexOf(node.value),
-          ...compileAst(node.children, args),
+          ...compileAst(node.children),
         ] satisfies CompiledTag;
       case TYPE.pound:
         // TYPE.pound is the octothorpe character used in plural and selectordinal
-        return args.indexOf("#");
+        return CompiledOrdinal;
       case TYPE.time:
         return [
+          node.value,
           JSON_AST_TYPE_FN,
-          args.indexOf(node.value),
           "time",
           ...(node.style !== null ? [node.style] : []),
         ] satisfies CompiledFn;
       case TYPE.date:
         return [
+          node.value,
           JSON_AST_TYPE_FN,
-          args.indexOf(node.value),
           "date",
           ...(node.style !== null ? [node.style] : []),
         ] satisfies CompiledFn;
       case TYPE.number:
         return node.style === null
           ? ([
+              node.value,
               JSON_AST_TYPE_FN,
-              args.indexOf(node.value),
               "number",
             ] satisfies CompiledFn)
           : ([
-              JSON_AST_TYPE_FN,
-              args.indexOf(node.value),
+             node.value,
+             JSON_AST_TYPE_FN,
               "numberFmt",
               getNumberFormat(node.style),
             ] satisfies CompiledFn);
@@ -190,7 +193,7 @@ const compileStringInterpolation = (
   str: string
 ): { args: Record<string, ArgumentUsage[]>; json: CompiledAst } => {
   const translationParts = str
-    .split(/\[(\d+)\]/g);
+    .split(/\[(\d+)\]/g).map((part, index) => index % 2 === 0 ? part : [parseInt(part, 10)] satisfies CompiledArgument);
   if (translationParts.length === 1) {
     return {
       args: {},
@@ -198,12 +201,10 @@ const compileStringInterpolation = (
     };
   }
   const argList = [...new Set(translationParts.filter((_, index) => index % 2 === 1))];
-  const contents = translationParts.map((translationPart, index) => {
-    return index % 2 === 0 ? translationPart : argList.indexOf(translationPart);
-  }) satisfies CompiledAstContents[];
+  const contents = translationParts satisfies CompiledAstContents[];
   return {
     args: Object.fromEntries(argList.map((arg) => [arg, ["argument"]])),
-    json: [argList.map(Number) as any[], ...contents] satisfies CompiledAst,
+    json: contents satisfies CompiledAst,
   };
 };
 

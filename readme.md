@@ -4,8 +4,8 @@
 
 Precompile i18n [icu syntax](https://formatjs.io/docs/core-concepts/icu-syntax) translations to JSON at build time and render them at runtime
 
-Build Time: `compile("Hello {name}")` → `[["name"],"Hello ",0]`  
-Run Time: `run( [["name"],"Hello ",0], { name: "World"} )` → `"Hello World"`
+Build Time: `compile("Hello {name}")` → `["Hello ",["name"]]`  
+Run Time: `run( ["Hello ",["name"]], { name: "World"} )` → `"Hello World"`
 
 ![icu-to-json logo](https://raw.githubusercontent.com/jantimon/icu-to-json/main/docs/logo.jpg)
 

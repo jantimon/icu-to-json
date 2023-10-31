@@ -4,26 +4,23 @@ exports[`measure size for fn example 1`] = `
 [
   "It is now {currentTime, time} on {currentTime, date}",
   [
-    [
-      "currentTime",
-    ],
     "It is now ",
     [
+      "currentTime",
       4,
-      0,
       "time",
     ],
     " on ",
     [
+      "currentTime",
       4,
-      0,
       "date",
     ],
   ],
   "
    size (icu message): 54b
-   size (json):        63b
-   overhead:           +17%
+   size (json):        71b
+   overhead:           +31%
 ",
 ]
 `;
@@ -32,23 +29,22 @@ exports[`measure size for integer example 1`] = `
 [
   "The integer value of {amount} is {amount, number, integer}",
   [
+    "The integer value of ",
     [
       "amount",
     ],
-    "The integer value of ",
-    0,
     " is ",
     [
+      "amount",
       4,
-      0,
       "numberFmt",
       "integer",
     ],
   ],
   "
    size (icu message): 60b
-   size (json):        73b
-   overhead:           +22%
+   size (json):        78b
+   overhead:           +30%
 ",
 ]
 `;
@@ -57,20 +53,20 @@ exports[`measure size for interpolatedStrings example 1`] = `
 [
   "Hello, my name is [0] and I am [1] years old.",
   [
+    "Hello, my name is ",
     [
       0,
+    ],
+    " and I am ",
+    [
       1,
     ],
-    "Hello, my name is ",
-    0,
-    " and I am ",
-    1,
     " years old.",
   ],
   "
    size (icu message): 47b
-   size (json):        59b
-   overhead:           +26%
+   size (json):        57b
+   overhead:           +21%
 ",
 ]
 `;
@@ -79,21 +75,18 @@ exports[`measure size for money example 1`] = `
 [
   "Buy now to save {amount, number, currency:GBP}",
   [
-    [
-      "amount",
-    ],
     "Buy now to save ",
     [
+      "amount",
       4,
-      0,
       "numberFmt",
       "currency:GBP",
     ],
   ],
   "
    size (icu message): 48b
-   size (json):        64b
-   overhead:           +33%
+   size (json):        60b
+   overhead:           +25%
 ",
 ]
 `;
@@ -102,21 +95,18 @@ exports[`measure size for number example 1`] = `
 [
   "I have {numCats, number} cats.",
   [
-    [
-      "numCats",
-    ],
     "I have ",
     [
+      "numCats",
       4,
-      0,
       "number",
     ],
     " cats.",
   ],
   "
    size (icu message): 32b
-   size (json):        47b
-   overhead:           +47%
+   size (json):        43b
+   overhead:           +34%
 ",
 ]
 `;
@@ -125,13 +115,10 @@ exports[`measure size for percentage example 1`] = `
 [
   "You reached {value, number, %} of your goal!",
   [
-    [
-      "value",
-    ],
     "You reached ",
     [
+      "value",
       4,
-      0,
       "numberFmt",
       "percent",
     ],
@@ -139,8 +126,8 @@ exports[`measure size for percentage example 1`] = `
   ],
   "
    size (icu message): 46b
-   size (json):        71b
-   overhead:           +54%
+   size (json):        67b
+   overhead:           +46%
 ",
 ]
 `;
@@ -151,17 +138,14 @@ exports[`measure size for plural example 1`] = `
   [
     [
       "count",
-    ],
-    [
       2,
-      0,
       {
         "one": [
-          -1,
+          0,
           " image",
         ],
         "other": [
-          -1,
+          0,
           " images",
         ],
       },
@@ -169,8 +153,8 @@ exports[`measure size for plural example 1`] = `
   ],
   "
    size (icu message): 50b
-   size (json):        62b
-   overhead:           +24%
+   size (json):        56b
+   overhead:           +12%
 ",
 ]
 `;
@@ -179,15 +163,13 @@ exports[`measure size for select example 1`] = `
 [
   "Hello, Your friend {friend} is now online. {gender, select, female {She} male {He} other {They}} added a new image to the system.",
   [
+    "Hello, Your friend ",
     [
       "friend",
-      "gender",
     ],
-    "Hello, Your friend ",
-    0,
     " is now online. ",
     [
-      1,
+      "gender",
       1,
       {
         "female": [
@@ -205,8 +187,8 @@ exports[`measure size for select example 1`] = `
   ],
   "
    size (icu message): 131b
-   size (json):        156b
-   overhead:           +19%
+   size (json):        152b
+   overhead:           +16%
 ",
 ]
 `;
@@ -215,14 +197,10 @@ exports[`measure size for selectNumeric example 1`] = `
 [
   "She has {children, plural, =0 {no children} =1 {1 child} other {# children}} and lives in {city}.",
   [
-    [
-      "children",
-      "city",
-    ],
     "She has ",
     [
+      "children",
       2,
-      0,
       {
         "0": [
           "no children",
@@ -231,19 +209,21 @@ exports[`measure size for selectNumeric example 1`] = `
           "1 child",
         ],
         "other": [
-          -1,
+          0,
           " children",
         ],
       },
     ],
     " and lives in ",
-    1,
+    [
+      "city",
+    ],
     ".",
   ],
   "
    size (icu message): 99b
-   size (json):        124b
-   overhead:           +25%
+   size (json):        119b
+   overhead:           +20%
 ",
 ]
 `;
@@ -252,28 +232,25 @@ exports[`measure size for selectordinal example 1`] = `
 [
   "You finished {place, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}!",
   [
-    [
-      "place",
-    ],
     "You finished ",
     [
+      "place",
       3,
-      0,
       {
         "few": [
-          -1,
+          0,
           "rd",
         ],
         "one": [
-          -1,
+          0,
           "st",
         ],
         "other": [
-          -1,
+          0,
           "th",
         ],
         "two": [
-          -1,
+          0,
           "nd",
         ],
       },
@@ -282,8 +259,8 @@ exports[`measure size for selectordinal example 1`] = `
   ],
   "
    size (icu message): 81b
-   size (json):        105b
-   overhead:           +30%
+   size (json):        97b
+   overhead:           +20%
 ",
 ]
 `;
@@ -292,22 +269,20 @@ exports[`measure size for tags example 1`] = `
 [
   "Wow formatJs allows <b>{dynamic} tags</b>",
   [
-    [
-      "b",
-      "dynamic",
-    ],
     "Wow formatJs allows ",
     [
+      "b",
       5,
-      0,
-      1,
+      [
+        "dynamic",
+      ],
       " tags",
     ],
   ],
   "
    size (icu message): 43b
-   size (json):        56b
-   overhead:           +30%
+   size (json):        52b
+   overhead:           +21%
 ",
 ]
 `;
@@ -328,28 +303,25 @@ exports[`measure size for time example 1`] = `
 [
   "Sale begins {start, time, short} at {start, date, short}",
   [
-    [
-      "start",
-    ],
     "Sale begins ",
     [
+      "start",
       4,
-      0,
       "time",
       "short",
     ],
     " at ",
     [
+      "start",
       4,
-      0,
       "date",
       "short",
     ],
   ],
   "
    size (icu message): 58b
-   size (json):        75b
-   overhead:           +29%
+   size (json):        77b
+   overhead:           +33%
 ",
 ]
 `;
@@ -361,13 +333,12 @@ exports[`measure size for variable example 1`] = `
     [
       "name",
     ],
-    0,
     " has just entered the chat",
   ],
   "
    size (icu message): 34b
-   size (json):        41b
-   overhead:           +21%
+   size (json):        39b
+   overhead:           +15%
 ",
 ]
 `;

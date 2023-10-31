@@ -233,11 +233,11 @@ function generateDictionaryApi(source: unknown, options: Options = {}): string {
     `/**
   * This function is used to create a translation function that returns a rich AST
   */`,
-    `export const createTranslationRitchFn = (messages: Record<string, unknown>, lang: Language, childPreprocessor?: (children: unknown) => any) => {
-  const richFormatters = {...formatters, children: childPreprocessor}${
+    `export const createTranslationRitchFn = (messages: Record<string, unknown>, lang: Language, richFormatters?: { tag: (children: unknown) => any, baseTag:(tagName: string, children: unknown) => any }) => {
+  const customFormatters = {...formatters, ...richFormatters}${
     /* TODO - fix formatter typings */ " as any"
     };
-  return <TKey extends keyof MessageArguments>(key: TKey, args: MessageArguments[TKey]) => evaluateAst(messages[key] as CompiledAst, lang, args as Record<string, string | number | Date>, richFormatters);
+  return <TKey extends keyof MessageArguments>(key: TKey, args: MessageArguments[TKey]) => evaluateAst(messages[key] as CompiledAst, lang, args as Record<string, string | number | Date>, customFormatters);
 };`
   );
 

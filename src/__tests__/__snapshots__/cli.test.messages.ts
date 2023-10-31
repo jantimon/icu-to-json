@@ -58,7 +58,7 @@ export const createTranslationFn = (messages: Record<string, unknown>, lang: Lan
 /**
   * This function is used to create a translation function that returns a rich AST
   */
-export const createTranslationRitchFn = (messages: Record<string, unknown>, lang: Language, childPreprocessor?: (children: unknown) => any) => {
-  const richFormatters = {...formatters, children: childPreprocessor} as any;
-  return <TKey extends keyof MessageArguments>(key: TKey, args: MessageArguments[TKey]) => evaluateAst(messages[key] as CompiledAst, lang, args as Record<string, string | number | Date>, richFormatters);
+export const createTranslationRitchFn = (messages: Record<string, unknown>, lang: Language, richFormatters?: { tag: (children: unknown) => any, baseTag:(tagName: string, children: unknown) => any }) => {
+  const customFormatters = {...formatters, ...richFormatters} as any;
+  return <TKey extends keyof MessageArguments>(key: TKey, args: MessageArguments[TKey]) => evaluateAst(messages[key] as CompiledAst, lang, args as Record<string, string | number | Date>, customFormatters);
 };
